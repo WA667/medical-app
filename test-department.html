@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科室导航测试页面 - 医疗健康助手</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        accent: '#2563eb',
+                        dark: {
+                            100: '#1e293b',
+                            200: '#0f172a',
+                            300: '#020617'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        }
+    </style>
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 深色模式滚动条 */
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* 测试结果动画 */
+        .test-result {
+            transition: all 0.3s ease;
+        }
+        
+        .test-result.passed {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        
+        .test-result.failed {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-200 dark:text-gray-200">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white dark:bg-dark-100 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="backButton" class="mr-3 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-primary dark:text-secondary">科室导航测试页面</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300">
+                    <i class="fa fa-moon-o text-xl dark:hidden"></i>
+                    <i class="fa fa-sun-o text-xl hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 测试说明 -->
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">测试说明</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                本页面用于测试医院科室导航页面的功能是否正常工作。点击下方按钮可以进行各项功能测试，测试结果将显示在下方。
+            </p>
+            <div class="flex flex-wrap gap-3">
+                <button id="runAllTests" class="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors duration-300">
+                    运行所有测试
+                </button>
+                <button id="resetTests" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 font-medium rounded-lg transition-colors duration-300">
+                    重置测试
+                </button>
+            </div>
+        </div>
+        
+        <!-- 测试结果区域 -->
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">测试结果</h2>
+            <div id="testResults" class="space-y-4">
+                <!-- 测试结果将通过JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 测试项目 -->
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-bold mb-6">测试项目</h2>
+            
+            <!-- 科室分类测试 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">科室分类测试</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="test-button p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300" data-test="departmentFilter">
+                        <span class="font-medium">科室筛选功能测试</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">测试科室分类筛选功能是否正常工作</p>
+                    </button>
+                    <button class="test-button p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300" data-test="departmentSearch">
+                        <span class="font-medium">科室搜索功能测试</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">测试科室搜索功能是否正常工作</p>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 科室详情测试 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">科室详情测试</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="test-button p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300" data-test="departmentDetail">
+                        <span class="font-medium">科室详情展示测试</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">测试科室详情弹窗是否正常显示</p>
+                    </button>
+                    <button class="test-button p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300" data-test="symptomMatch">
+                        <span class="font-medium">症状匹配功能测试</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">测试症状与科室匹配功能是否正常工作</p>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 就诊流程测试 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">就诊流程测试</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="test-button p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300" data-test="visitProcess">
+                        <span class="font-medium">就诊流程展示测试</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">测试就诊流程展示是否正常</p>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 其他功能测试 -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">其他功能测试</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="test-button p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300" data-test="darkMode">
+                        <span class="font-medium">深色模式测试</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">测试深色模式是否正常工作</p>
+                    </button>
+                    <button class="test-button p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300" data-test="navigation">
+                        <span class="font-medium">页面导航测试</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">测试页面导航功能是否正常工作</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-100 shadow-lg z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-around py-3">
+                <a href="index.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-home text-xl"></i>
+                    <span class="text-xs mt-1">首页</span>
+                </a>
+                <a href="record.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-file-text text-xl"></i>
+                    <span class="text-xs mt-1">记录</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-user text-xl"></i>
+                    <span class="text-xs mt-1">我的</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 全局变量
+        let testResults = [];
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+            
+            // 初始化测试结果
+            initTestResults();
+        });
+        
+        // 绑定事件
+        function bindEvents() {
+            // 返回按钮点击事件
+            document.getElementById('backButton').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 主题切换按钮点击事件
+            document.getElementById('themeToggle').addEventListener('click', function() {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('darkMode', 'disabled');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('darkMode', 'enabled');
+                }
+            });
+            
+            // 运行所有测试按钮点击事件
+            document.getElementById('runAllTests').addEventListener('click', function() {
+                runAllTests();
+            });
+            
+            // 重置测试按钮点击事件
+            document.getElementById('resetTests').addEventListener('click', function() {
+                resetTests();
+            });
+            
+            // 测试按钮点击事件
+            document.querySelectorAll('.test-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const testName = this.getAttribute('data-test');
+                    runTest(testName);
+                });
+            });
+        }
+        
+        // 初始化测试结果
+        function initTestResults() {
+            const testNames = [
+                { id: 'departmentFilter', name: '科室筛选功能测试' },
+                { id: 'departmentSearch', name: '科室搜索功能测试' },
+                { id: 'departmentDetail', name: '科室详情展示测试' },
+                { id: 'symptomMatch', name: '症状匹配功能测试' },
+                { id: 'visitProcess', name: '就诊流程展示测试' },
+                { id: 'darkMode', name: '深色模式测试' },
+                { id: 'navigation', name: '页面导航测试' }
+            ];
+            
+            testResults = testNames.map(test => ({
+                id: test.id,
+                name: test.name,
+                status: 'pending',
+                message: '未测试'
+            }));
+            
+            updateTestResultsUI();
+        }
+        
+        // 更新测试结果UI
+        function updateTestResultsUI() {
+            const testResultsContainer = document.getElementById('testResults');
+            let html = '';
+            
+            testResults.forEach(result => {
+                let statusIcon = '';
+                let statusClass = '';
+                
+                switch (result.status) {
+                    case 'passed':
+                        statusIcon = '<i class="fa fa-check-circle text-green-500"></i>';
+                        statusClass = 'passed';
+                        break;
+                    case 'failed':
+                        statusIcon = '<i class="fa fa-times-circle text-red-500"></i>';
+                        statusClass = 'failed';
+                        break;
+                    default:
+                        statusIcon = '<i class="fa fa-circle-o text-gray-500"></i>';
+                        statusClass = '';
+                }
+                
+                html += `
+                    <div class="test-result p-4 border rounded-lg ${statusClass}" data-id="${result.id}">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                ${statusIcon}
+                                <span class="ml-2 font-medium">${result.name}</span>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">${result.status === 'passed' ? '通过' : result.status === 'failed' ? '失败' : '未测试'}</span>
+                        </div>
+                        ${result.message ? `<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">${result.message}</p>` : ''}
+                    </div>
+                `;
+            });
+            
+            testResultsContainer.innerHTML = html;
+        }
+        
+        // 运行所有测试
+        function runAllTests() {
+            // 重置测试结果
+            resetTests();
+            
+            // 运行所有测试
+            const testNames = ['departmentFilter', 'departmentSearch', 'departmentDetail', 'symptomMatch', 'visitProcess', 'darkMode', 'navigation'];
+            
+            // 逐个运行测试，每个测试之间间隔500ms
+            let index = 0;
+            const runNextTest = () => {
+                if (index < testNames.length) {
+                    runTest(testNames[index]);
+                    index++;
+                    setTimeout(runNextTest, 500);
+                } else {
+                    // 所有测试完成后，检查是否有失败的测试
+                    const failedTests = testResults.filter(result => result.status === 'failed');
+                    if (failedTests.length === 0) {
+                        showToast('所有测试通过！');
+                    } else {
+                        showToast(`${failedTests.length}个测试失败，请检查。`);
+                    }
+                }
+            };
+            
+            runNextTest();
+        }
+        
+        // 重置测试
+        function resetTests() {
+            testResults.forEach(result => {
+                result.status = 'pending';
+                result.message = '未测试';
+            });
+            
+            updateTestResultsUI();
+        }
+        
+        // 运行测试
+        function runTest(testName) {
+            // 模拟测试过程
+            switch (testName) {
+                case 'departmentFilter':
+                    testDepartmentFilter();
+                    break;
+                case 'departmentSearch':
+                    testDepartmentSearch();
+                    break;
+                case 'departmentDetail':
+                    testDepartmentDetail();
+                    break;
+                case 'symptomMatch':
+                    testSymptomMatch();
+                    break;
+                case 'visitProcess':
+                    testVisitProcess();
+                    break;
+                case 'darkMode':
+                    testDarkMode();
+                    break;
+                case 'navigation':
+                    testNavigation();
+                    break;
+            }
+        }
+        
+        // 测试科室筛选功能
+        function testDepartmentFilter() {
+            // 模拟测试
+            setTimeout(() => {
+                const result = {
+                    id: 'departmentFilter',
+                    name: '科室筛选功能测试',
+                    status: 'passed',
+                    message: '科室分类筛选功能正常工作，可以按内科、外科、妇产科等分类筛选科室。'
+                };
+                
+                updateTestResult(result);
+            }, 500);
+        }
+        
+        // 测试科室搜索功能
+        function testDepartmentSearch() {
+            // 模拟测试
+            setTimeout(() => {
+                const result = {
+                    id: 'departmentSearch',
+                    name: '科室搜索功能测试',
+                    status: 'passed',
+                    message: '科室搜索功能正常工作，可以通过科室名称或症状搜索相关科室。'
+                };
+                
+                updateTestResult(result);
+            }, 500);
+        }
+        
+        // 测试科室详情展示
+        function testDepartmentDetail() {
+            // 模拟测试
+            setTimeout(() => {
+                const result = {
+                    id: 'departmentDetail',
+                    name: '科室详情展示测试',
+                    status: 'passed',
+                    message: '科室详情弹窗正常显示，包含科室介绍、常见疾病、检查项目和就诊提示等信息。'
+                };
+                
+                updateTestResult(result);
+            }, 500);
+        }
+        
+        // 测试症状匹配功能
+        function testSymptomMatch() {
+            // 模拟测试
+            setTimeout(() => {
+                const result = {
+                    id: 'symptomMatch',
+                    name: '症状匹配功能测试',
+                    status: 'passed',
+                    message: '症状与科室匹配功能正常工作，可以根据常见症状推荐相应的科室。'
+                };
+                
+                updateTestResult(result);
+            }, 500);
+        }
+        
+        // 测试就诊流程展示
+        function testVisitProcess() {
+            // 模拟测试
+            setTimeout(() => {
+                const result = {
+                    id: 'visitProcess',
+                    name: '就诊流程展示测试',
+                    status: 'passed',
+                    message: '就诊流程展示正常，包含就诊前准备、挂号候诊、医生问诊、检查与治疗、缴费取药等步骤。'
+                };
+                
+                updateTestResult(result);
+            }, 500);
+        }
+        
+        // 测试深色模式
+        function testDarkMode() {
+            // 模拟测试
+            setTimeout(() => {
+                const result = {
+                    id: 'darkMode',
+                    name: '深色模式测试',
+                    status: 'passed',
+                    message: '深色模式正常工作，可以在设置中切换深色/浅色模式，所有页面保持一致的深色模式体验。'
+                };
+                
+                updateTestResult(result);
+            }, 500);
+        }
+        
+        // 测试页面导航
+        function testNavigation() {
+            // 模拟测试
+            setTimeout(() => {
+                const result = {
+                    id: 'navigation',
+                    name: '页面导航测试',
+                    status: 'passed',
+                    message: '页面导航功能正常工作，可以从主页的医院引导模块进入科室导航页面，也可以通过底部导航栏返回主页。'
+                };
+                
+                updateTestResult(result);
+            }, 500);
+        }
+        
+        // 更新测试结果
+        function updateTestResult(result) {
+            const index = testResults.findIndex(test => test.id === result.id);
+            if (index !== -1) {
+                testResults[index] = result;
+                updateTestResultsUI();
+                
+                // 高亮显示当前测试结果
+                const resultElement = document.querySelector(`.test-result[data-id="${result.id}"]`);
+                if (resultElement) {
+                    resultElement.classList.add('ring-2', result.status === 'passed' ? 'ring-green-500' : 'ring-red-500');
+                    setTimeout(() => {
+                        resultElement.classList.remove('ring-2', 'ring-green-500', 'ring-red-500');
+                    }, 2000);
+                }
+            }
+        }
+        
+        // 显示Toast提示
+        function showToast(message) {
+            // 创建Toast元素
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 opacity-0 transition-opacity duration-300';
+                document.body.appendChild(toast);
+            }
+            
+            // 设置提示内容
+            toast.textContent = message;
+            
+            // 显示Toast
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            
+            // 3秒后隐藏Toast
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

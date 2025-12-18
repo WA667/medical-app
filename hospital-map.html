@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>附近医院 - 医疗健康助手</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 高德地图 API 安全配置 -->
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: '8b978fe4ad0ded2b65ad21c12cede722' // 安全密钥，实际使用时请替换为自己的
+        };
+    </script>
+    <!-- 高德地图 Loader -->
+    <script type="text/javascript" src="https://webapi.amap.com/loader.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        accent: '#2563eb',
+                        dark: {
+                            100: '#1e293b',
+                            200: '#0f172a',
+                            300: '#020617'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 深色模式滚动条 */
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* 页面过渡动画 */
+        .page-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 地图容器样式 */
+        #mapContainer {
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - 12rem);
+            z-index: 1;
+        }
+        
+        /* 医院列表容器样式 */
+        .hospital-list-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        /* 医院列表项样式 */
+        .hospital-item {
+            transition: all 0.3s ease;
+        }
+        
+        .hospital-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        /* 医院详情弹窗样式 */
+        .hospital-detail-popup {
+            max-width: 300px;
+        }
+        
+        /* 加载动画样式 */
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3b82f6;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 深色模式样式 */
+        .dark .hospital-item:hover {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-200 dark:text-gray-200 page-transition">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white dark:bg-dark-100 shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="backButton" class="mr-3 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-primary dark:text-secondary">附近医院</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="refreshButton" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300">
+                    <i class="fa fa-refresh text-xl"></i>
+                </button>
+                <button id="filterButton" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300">
+                    <i class="fa fa-filter text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 地图容器 -->
+        <div class="relative bg-white dark:bg-dark-100 rounded-xl shadow-lg overflow-hidden mb-6">
+            <!-- 加载指示器 -->
+            <div id="mapLoading" class="absolute inset-0 flex items-center justify-center bg-white dark:bg-dark-200 z-20">
+                <div class="flex flex-col items-center">
+                    <div class="loading-spinner mb-3"></div>
+                    <p class="text-gray-600 dark:text-gray-300">正在加载地图...</p>
+                </div>
+            </div>
+            
+            <!-- 地图 -->
+            <div id="mapContainer"></div>
+            
+            <!-- 位置信息提示 -->
+            <div id="locationInfo" class="absolute top-4 left-4 bg-white dark:bg-dark-100 rounded-lg shadow-lg p-3 z-30 max-w-xs hidden">
+                <div class="flex items-center">
+                    <i class="fa fa-map-marker text-primary dark:text-secondary mr-2"></i>
+                    <p id="locationText" class="text-sm font-medium"></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 医院列表 -->
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">附近医院列表</h2>
+                <span id="hospitalCount" class="text-sm text-gray-500 dark:text-gray-400">0 家医院</span>
+            </div>
+            
+            <!-- 医院列表容器 -->
+            <div id="hospitalList" class="hospital-list-container space-y-4">
+                <!-- 医院列表将通过 JavaScript 动态生成 -->
+                <div class="flex items-center justify-center py-8">
+                    <div class="flex flex-col items-center">
+                        <div class="loading-spinner mb-3"></div>
+                        <p class="text-gray-600 dark:text-gray-300">正在获取附近医院...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-100 shadow-lg z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-around py-3">
+                <a href="index.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-home text-xl"></i>
+                    <span class="text-xs mt-1">首页</span>
+                </a>
+                <a href="record.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-file-text text-xl"></i>
+                    <span class="text-xs mt-1">记录</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-user text-xl"></i>
+                    <span class="text-xs mt-1">我的</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 筛选模态框 -->
+    <div id="filterModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="filterModalOverlay"></div>
+        <div class="relative bg-white dark:bg-dark-100 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">筛选条件</h3>
+                <button id="closeFilterModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- 距离筛选 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">距离范围</label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="distance" value="1000" class="mr-2 text-primary" checked>
+                            <span>1公里内</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="distance" value="3000" class="mr-2 text-primary">
+                            <span>3公里内</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="distance" value="5000" class="mr-2 text-primary">
+                            <span>5公里内</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 医院类型筛选 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">医院类型</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="hospitalType" value="090100" class="mr-2 text-primary" checked>
+                            <span>综合医院</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="hospitalType" value="090101" class="mr-2 text-primary" checked>
+                            <span>三级甲等医院</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="hospitalType" value="090102" class="mr-2 text-primary" checked>
+                            <span>二级医院</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="hospitalType" value="090103" class="mr-2 text-primary" checked>
+                            <span>一级医院</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="hospitalType" value="090200" class="mr-2 text-primary" checked>
+                            <span>专科医院</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 特殊服务筛选 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">特殊服务</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="service" value="24小时急诊" class="mr-2 text-primary">
+                            <span>24小时急诊</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="service" value="医保定点" class="mr-2 text-primary">
+                            <span>医保定点</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="service" value="预约挂号" class="mr-2 text-primary">
+                            <span>支持预约挂号</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 筛选按钮 -->
+                <div class="pt-4">
+                    <button id="applyFilter" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300">
+                        应用筛选
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 全局变量
+        let map = null;
+        let userLocation = null;
+        let markers = [];
+        let hospitals = [];
+        
+        // 深色模式切换
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        
+        // 检查本地存储中的主题偏好
+        if (localStorage.getItem('darkMode') === 'enabled' || 
+            (localStorage.getItem('darkMode') !== 'disabled' && 
+             window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载高德地图 API
+            loadAMapAPI();
+            
+            // 绑定事件
+            bindEvents();
+        });
+        
+        // 加载高德地图 API
+        function loadAMapAPI() {
+            AMapLoader.load({
+                key: 'e2069701097323600495381205600431', // 替换为自己的 API Key
+                version: '2.0',
+                plugins: ['AMap.Scale', 'AMap.ToolBar', 'AMap.Geocoder', 'AMap.PlaceSearch'],
+                AMapUI: {
+                    version: '1.1',
+                    plugins: []
+                }
+            }).then(function(AMap) {
+                // API 加载成功，初始化地图
+                window.AMap = AMap;
+                initMap();
+            }).catch(function(e) {
+                console.error('高德地图 API 加载失败:', e);
+                
+                // 隐藏加载指示器
+                document.getElementById('mapLoading').classList.add('hidden');
+                
+                // 显示错误信息
+                document.getElementById('hospitalList').innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fa fa-exclamation-circle text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600 dark:text-gray-300">地图加载失败，请检查您的网络连接</p>
+                        <button id="retryLoadMap" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg">
+                            重试
+                        </button>
+                    </div>
+                `;
+                
+                // 添加重试按钮点击事件
+                document.getElementById('retryLoadMap').addEventListener('click', function() {
+                    // 显示加载指示器
+                    document.getElementById('mapLoading').classList.remove('hidden');
+                    
+                    // 重新加载地图
+                    loadAMapAPI();
+                });
+            });
+        }
+        
+        // 初始化地图
+        function initMap() {
+            // 创建地图实例
+            map = new AMap.Map('mapContainer', {
+                zoom: 14,
+                resizeEnable: true,
+                zoomEnable: true,
+                dragEnable: true
+            });
+            
+            // 添加地图控件
+            map.addControl(new AMap.Scale());
+            map.addControl(new AMap.ToolBar({
+                position: 'RB'
+            }));
+            
+            // 检查浏览器是否支持地理定位
+            if (navigator.geolocation) {
+                // 请求用户位置
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        // 位置获取成功
+                        userLocation = {
+                            lng: position.coords.longitude,
+                            lat: position.coords.latitude
+                        };
+                        
+                        // 将地图中心移动到用户位置
+                        map.setCenter([userLocation.lng, userLocation.lat]);
+                        
+                        // 添加用户位置标记
+                        addUserMarker();
+                        
+                        // 获取附近医院
+                        searchNearbyHospitals();
+                    },
+                    error => {
+                        // 位置获取失败
+                        handleLocationError(error);
+                    }
+                );
+            } else {
+                // 浏览器不支持地理定位
+                alert('您的浏览器不支持地理定位功能，请手动搜索医院');
+                
+                // 隐藏加载指示器
+                document.getElementById('mapLoading').classList.add('hidden');
+            }
+        }
+        
+        // 添加用户位置标记
+        function addUserMarker() {
+            const userMarker = new AMap.Marker({
+                position: [userLocation.lng, userLocation.lat],
+                icon: new AMap.Icon({
+                    size: new AMap.Size(30, 30),
+                    image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+                    imageSize: new AMap.Size(30, 30)
+                }),
+                title: '您的位置',
+                anchor: 'bottom-center'
+            });
+            
+            userMarker.setMap(map);
+            
+            // 添加用户位置信息提示
+            const locationInfo = document.getElementById('locationInfo');
+            const locationText = document.getElementById('locationText');
+            
+            // 使用逆地理编码获取位置名称
+            const geocoder = new AMap.Geocoder({
+                radius: 1000,
+                extensions: "all"
+            });
+            
+            geocoder.getAddress([userLocation.lng, userLocation.lat], function(status, result) {
+                if (status === 'complete' && result.info === 'OK') {
+                    const address = result.regeocode.formattedAddress;
+                    locationText.textContent = address;
+                    locationInfo.classList.remove('hidden');
+                }
+            });
+        }
+        
+        // 搜索附近医院
+        function searchNearbyHospitals() {
+            // 获取筛选条件
+            const distance = document.querySelector('input[name="distance"]:checked').value;
+            const hospitalTypes = Array.from(document.querySelectorAll('input[name="hospitalType"]:checked')).map(cb => cb.value);
+            
+            // 如果没有选择医院类型，默认搜索综合医院
+            const types = hospitalTypes.length > 0 ? hospitalTypes.join('|') : '090100';
+            
+            // 创建POI搜索实例
+            const placeSearch = new AMap.PlaceSearch({
+                pageSize: 20,
+                pageIndex: 1,
+                types: types,
+                radius: distance,
+                sortrule: 'distance',
+                citylimit: true,
+                extensions: 'all' // 返回详细信息
+            });
+            
+            console.log('搜索参数:', {
+                location: [userLocation.lng, userLocation.lat],
+                radius: distance,
+                types: types
+            });
+            
+            // 执行周边搜索
+            placeSearch.searchNearBy('', [userLocation.lng, userLocation.lat], distance, function(status, result) {
+                console.log('搜索结果:', status, result);
+                
+                // 隐藏加载指示器
+                document.getElementById('mapLoading').classList.add('hidden');
+                
+                if (status === 'complete' && result.info === 'OK') {
+                    // 处理搜索结果
+                    handleSearchResults(result);
+                } else {
+                    // 搜索失败
+                    let errorMessage = '未找到附近医院，请尝试调整筛选条件';
+                    if (result && result.info) {
+                        errorMessage += ` (${result.info})`;
+                    }
+                    
+                    document.getElementById('hospitalList').innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fa fa-exclamation-circle text-4xl text-gray-400 mb-3"></i>
+                            <p class="text-gray-600 dark:text-gray-300">${errorMessage}</p>
+                            <button id="retrySearch" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg">
+                                重试
+                            </button>
+                        </div>
+                    `;
+                    
+                    // 添加重试按钮点击事件
+                    document.getElementById('retrySearch').addEventListener('click', function() {
+                        // 显示加载指示器
+                        document.getElementById('mapLoading').classList.remove('hidden');
+                        
+                        // 重新搜索附近医院
+                        searchNearbyHospitals();
+                    });
+                }
+            });
+        }
+        
+        // 处理搜索结果
+        function handleSearchResults(result) {
+            // 清空之前的标记
+            clearMarkers();
+            
+            // 保存医院数据
+            hospitals = result.poiList.pois;
+            
+            // 更新医院数量
+            document.getElementById('hospitalCount').textContent = `${hospitals.length} 家医院`;
+            
+            // 添加医院标记
+            addHospitalMarkers();
+            
+            // 更新医院列表
+            updateHospitalList();
+        }
+        
+        // 添加医院标记
+        function addHospitalMarkers() {
+            hospitals.forEach(hospital => {
+                // 创建医院标记
+                const marker = new AMap.Marker({
+                    position: [hospital.location.lng, hospital.location.lat],
+                    icon: createHospitalIcon(hospital),
+                    title: hospital.name,
+                    anchor: 'bottom-center'
+                });
+                
+                // 添加点击事件
+                marker.on('click', function() {
+                    showHospitalInfo(hospital);
+                });
+                
+                marker.setMap(map);
+                markers.push(marker);
+                
+                // 添加医院名称标签
+                const label = new AMap.Label({
+                    position: [hospital.location.lng, hospital.location.lat],
+                    content: hospital.name,
+                    offset: new AMap.Pixel(0, -30),
+                    className: 'hospital-label'
+                });
+                
+                label.setMap(map);
+                markers.push(label);
+            });
+            
+            // 调整地图视野以显示所有标记
+            if (markers.length > 0) {
+                const bounds = new AMap.Bounds();
+                markers.forEach(marker => {
+                    if (marker.getPosition) {
+                        bounds.extend(marker.getPosition());
+                    }
+                });
+                
+                // 扩展边界以确保用户位置在视野内
+                bounds.extend([userLocation.lng, userLocation.lat]);
+                
+                // 设置地图视野
+                map.setBounds(bounds, true);
+            }
+        }
+        
+        // 创建医院图标
+        function createHospitalIcon(hospital) {
+            // 根据医院等级设置不同颜色
+            let iconColor = '#3b82f6'; // 默认蓝色
+            
+            if (hospital.type.includes('三级甲等')) {
+                iconColor = '#ef4444'; // 三级甲等医院 - 红色
+            } else if (hospital.type.includes('二级')) {
+                iconColor = '#f59e0b'; // 二级医院 - 橙色
+            } else if (hospital.type.includes('一级')) {
+                iconColor = '#10b981'; // 一级医院 - 绿色
+            } else if (hospital.type.includes('专科')) {
+                iconColor = '#8b5cf6'; // 专科医院 - 紫色
+            }
+            
+            // 创建自定义图标
+            return new AMap.Icon({
+                size: new AMap.Size(30, 30),
+                image: `https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png`,
+                imageSize: new AMap.Size(30, 30),
+                imageOffset: new AMap.Pixel(0, 0),
+                // 使用Canvas绘制自定义图标
+                content: `<div style="background-color: ${iconColor}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                            <i class="fa fa-hospital-o"></i>
+                          </div>`
+            });
+        }
+        
+        // 更新医院列表
+        function updateHospitalList() {
+            const hospitalList = document.getElementById('hospitalList');
+            hospitalList.innerHTML = '';
+            
+            if (hospitals.length === 0) {
+                hospitalList.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fa fa-exclamation-circle text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600 dark:text-gray-300">未找到附近医院，请尝试调整筛选条件</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 按距离排序
+            hospitals.sort((a, b) => a.distance - b.distance);
+            
+            // 创建医院列表项
+            hospitals.forEach((hospital, index) => {
+                const hospitalItem = document.createElement('div');
+                hospitalItem.className = 'hospital-item p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer';
+                hospitalItem.dataset.index = index;
+                
+                // 根据医院等级设置不同颜色
+                let levelColor = 'text-gray-600';
+                if (hospital.type.includes('三级甲等')) {
+                    levelColor = 'text-red-500';
+                } else if (hospital.type.includes('二级')) {
+                    levelColor = 'text-orange-500';
+                } else if (hospital.type.includes('一级')) {
+                    levelColor = 'text-green-500';
+                } else if (hospital.type.includes('专科')) {
+                    levelColor = 'text-purple-500';
+                }
+                
+                // 医院等级标签
+                let levelLabel = '';
+                if (hospital.type.includes('三级甲等')) {
+                    levelLabel = '<span class="inline-block px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full mr-1">三甲</span>';
+                } else if (hospital.type.includes('二级')) {
+                    levelLabel = '<span class="inline-block px-2 py-0.5 bg-orange-100 text-orange-800 text-xs rounded-full mr-1">二级</span>';
+                } else if (hospital.type.includes('一级')) {
+                    levelLabel = '<span class="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full mr-1">一级</span>';
+                } else if (hospital.type.includes('专科')) {
+                    levelLabel = '<span class="inline-block px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full mr-1">专科</span>';
+                }
+                
+                // 24小时急诊标签
+                const emergencyLabel = hospital.business && hospital.business.opentime_today && hospital.business.opentime_today.includes('24小时') 
+                    ? '<span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">24小时急诊</span>' 
+                    : '';
+                
+                // 医保定点标签
+                const insuranceLabel = hospital.business && hospital.business.keytag && hospital.business.keytag.includes('医保定点')
+                    ? '<span class="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full mr-1">医保定点</span>'
+                    : '';
+                
+                hospitalItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium text-gray-800 dark:text-gray-200">${hospital.name}</h3>
+                            <div class="flex items-center mt-1 text-sm">
+                                <span class="${levelColor}">${hospital.type.split(';')[2] || hospital.type.split(';')[1] || ''}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-medium text-primary">${(hospital.distance / 1000).toFixed(1)}km</span>
+                            <div class="text-xs text-gray-500">${getDistanceTime(hospital.distance)}</div>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex flex-wrap gap-1">
+                        ${levelLabel}
+                        ${insuranceLabel}
+                        ${emergencyLabel}
+                    </div>
+                    <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        <i class="fa fa-map-marker mr-1"></i> ${hospital.address}
+                    </div>
+                    ${hospital.business && hospital.business.tel ? `
+                        <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            <i class="fa fa-phone mr-1"></i> ${hospital.business.tel}
+                        </div>
+                    ` : ''}
+                `;
+                
+                // 添加点击事件
+                hospitalItem.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    showHospitalInfo(hospitals[index]);
+                    
+                    // 将地图中心移动到医院位置
+                    map.setCenter([hospitals[index].location.lng, hospitals[index].location.lat]);
+                    
+                    // 放大地图
+                    map.setZoom(16);
+                });
+                
+                hospitalList.appendChild(hospitalItem);
+            });
+        }
+        
+        // 显示医院详情
+        function showHospitalInfo(hospital) {
+            // 创建信息窗口
+            const infoWindow = new AMap.InfoWindow({
+                isCustom: true,
+                content: createInfoWindowContent(hospital),
+                position: [hospital.location.lng, hospital.location.lat],
+                offset: new AMap.Pixel(0, -30)
+            });
+            
+            // 打开信息窗口
+            infoWindow.open(map);
+            
+            // 添加导航按钮点击事件
+            setTimeout(() => {
+                const navButton = document.getElementById('navigateButton');
+                if (navButton) {
+                    navButton.addEventListener('click', function() {
+                        navigateToHospital(hospital);
+                    });
+                }
+            }, 100);
+        }
+        
+        // 创建信息窗口内容
+        function createInfoWindowContent(hospital) {
+            // 根据医院等级设置不同颜色
+            let levelColor = '#6b7280';
+            if (hospital.type.includes('三级甲等')) {
+                levelColor = '#ef4444';
+            } else if (hospital.type.includes('二级')) {
+                levelColor = '#f59e0b';
+            } else if (hospital.type.includes('一级')) {
+                levelColor = '#10b981';
+            } else if (hospital.type.includes('专科')) {
+                levelColor = '#8b5cf6';
+            }
+            
+            // 医院等级标签
+            let levelLabel = '';
+            if (hospital.type.includes('三级甲等')) {
+                levelLabel = '<span class="inline-block px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full mr-1">三甲</span>';
+            } else if (hospital.type.includes('二级')) {
+                levelLabel = '<span class="inline-block px-2 py-0.5 bg-orange-100 text-orange-800 text-xs rounded-full mr-1">二级</span>';
+            } else if (hospital.type.includes('一级')) {
+                levelLabel = '<span class="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full mr-1">一级</span>';
+            } else if (hospital.type.includes('专科')) {
+                levelLabel = '<span class="inline-block px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full mr-1">专科</span>';
+            }
+            
+            // 24小时急诊标签
+            const emergencyLabel = hospital.business && hospital.business.opentime_today && hospital.business.opentime_today.includes('24小时') 
+                ? '<span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">24小时急诊</span>' 
+                : '';
+            
+            // 医保定点标签
+            const insuranceLabel = hospital.business && hospital.business.keytag && hospital.business.keytag.includes('医保定点')
+                ? '<span class="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full mr-1">医保定点</span>'
+                : '';
+            
+            return `
+                <div class="hospital-detail-popup bg-white dark:bg-dark-100 rounded-lg shadow-lg p-4 w-72">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-gray-800 dark:text-gray-200">${hospital.name}</h3>
+                        <span class="text-primary font-medium">${(hospital.distance / 1000).toFixed(1)}km</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        ${levelLabel}
+                        ${insuranceLabel}
+                        ${emergencyLabel}
+                    </div>
+                    
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <i class="fa fa-map-marker mr-1"></i> ${hospital.address}
+                    </div>
+                    
+                    ${hospital.business && hospital.business.tel ? `
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            <i class="fa fa-phone mr-1"></i> ${hospital.business.tel}
+                        </div>
+                    ` : ''}
+                    
+                    ${hospital.business && hospital.business.opentime_today ? `
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            <i class="fa fa-clock-o mr-1"></i> ${hospital.business.opentime_today}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex justify-between">
+                        <button id="navigateButton" class="flex-1 bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300 text-sm">
+                            <i class="fa fa-location-arrow mr-1"></i> 导航前往
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 导航到医院
+        function navigateToHospital(hospital) {
+            if (!userLocation) {
+                alert('无法获取您的位置，无法进行导航');
+                return;
+            }
+            
+            // 使用高德地图导航
+            const url = `https://uri.amap.com/navigation?from=${userLocation.lng},${userLocation.lat},您的位置&to=${hospital.location.lng},${hospital.location.lat},${hospital.name}&mode=driving&policy=0`;
+            
+            // 打开导航链接
+            window.open(url, '_blank');
+        }
+        
+        // 计算距离所需时间
+        function getDistanceTime(distance) {
+            // 步行速度约为5km/h
+            const walkTime = Math.round(distance / 5000 * 60);
+            
+            // 驾车速度约为30km/h
+            const driveTime = Math.round(distance / 30000 * 60);
+            
+            return `步行${walkTime}分钟 | 驾车${driveTime}分钟`;
+        }
+        
+        // 清空标记
+        function clearMarkers() {
+            markers.forEach(marker => {
+                map.remove(marker);
+            });
+            markers = [];
+        }
+        
+        // 处理位置获取错误
+        function handleLocationError(error) {
+            console.error('位置获取失败:', error);
+            
+            // 隐藏加载指示器
+            document.getElementById('mapLoading').classList.add('hidden');
+            
+            // 显示错误信息
+            let errorMessage = '';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = '您拒绝了位置访问权限，请在设置中开启';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = '位置信息不可用';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = '位置获取超时，请重试';
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage = '未知错误，请重试';
+                    break;
+                default:
+                    errorMessage = '无法获取位置，请重试';
+            }
+            
+            // 显示错误信息
+            document.getElementById('hospitalList').innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fa fa-exclamation-circle text-4xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-600 dark:text-gray-300">${errorMessage}</p>
+                    <button id="retryLocation" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg">
+                        重试
+                    </button>
+                </div>
+            `;
+            
+            // 添加重试按钮点击事件
+            document.getElementById('retryLocation').addEventListener('click', function() {
+                // 显示加载指示器
+                document.getElementById('mapLoading').classList.remove('hidden');
+                
+                // 重新请求位置
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        // 位置获取成功
+                        userLocation = {
+                            lng: position.coords.longitude,
+                            lat: position.coords.latitude
+                        };
+                        
+                        // 将地图中心移动到用户位置
+                        map.setCenter([userLocation.lng, userLocation.lat]);
+                        
+                        // 添加用户位置标记
+                        addUserMarker();
+                        
+                        // 获取附近医院
+                        searchNearbyHospitals();
+                    },
+                    error => {
+                        // 位置获取失败
+                        handleLocationError(error);
+                    }
+                );
+            });
+        }
+        
+        // 绑定事件
+        function bindEvents() {
+            // 返回按钮点击事件
+            document.getElementById('backButton').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 刷新按钮点击事件
+            document.getElementById('refreshButton').addEventListener('click', function() {
+                // 显示加载指示器
+                document.getElementById('mapLoading').classList.remove('hidden');
+                
+                // 重新请求位置
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        // 位置获取成功
+                        userLocation = {
+                            lng: position.coords.longitude,
+                            lat: position.coords.latitude
+                        };
+                        
+                        // 将地图中心移动到用户位置
+                        map.setCenter([userLocation.lng, userLocation.lat]);
+                        
+                        // 获取附近医院
+                        searchNearbyHospitals();
+                    },
+                    error => {
+                        // 位置获取失败
+                        handleLocationError(error);
+                    }
+                );
+            });
+            
+            // 筛选按钮点击事件
+            document.getElementById('filterButton').addEventListener('click', function() {
+                document.getElementById('filterModal').classList.remove('hidden');
+            });
+            
+            // 关闭筛选模态框按钮点击事件
+            document.getElementById('closeFilterModal').addEventListener('click', function() {
+                document.getElementById('filterModal').classList.add('hidden');
+            });
+            
+            // 筛选模态框背景点击事件
+            document.getElementById('filterModalOverlay').addEventListener('click', function() {
+                document.getElementById('filterModal').classList.add('hidden');
+            });
+            
+            // 应用筛选按钮点击事件
+            document.getElementById('applyFilter').addEventListener('click', function() {
+                // 隐藏筛选模态框
+                document.getElementById('filterModal').classList.add('hidden');
+                
+                // 显示加载指示器
+                document.getElementById('mapLoading').classList.remove('hidden');
+                
+                // 重新搜索附近医院
+                searchNearbyHospitals();
+            });
+        }
+    </script>
+</body>
+</html>

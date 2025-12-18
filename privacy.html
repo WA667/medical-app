@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>隐私设置 - 医疗健康应用</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E88E5',
+            secondary: '#64B5F6',
+            accent: '#0D47A1',
+            light: '#E3F2FD',
+            dark: '#0D47A1'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .dark .glass-effect {
+        background: rgba(17, 24, 39, 0.7);
+      }
+      .card-shadow {
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      }
+      .dark .card-shadow {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .dark .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .transition-all-300 {
+        transition: all 0.3s ease;
+      }
+    }
+  </style>
+  
+  <style>
+    /* 深色模式样式 */
+    .dark {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark body {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark .bg-white {
+      background-color: #1f2937;
+    }
+    
+    .dark .bg-gray-50 {
+      background-color: #111827;
+    }
+    
+    .dark .bg-gray-100 {
+      background-color: #374151;
+    }
+    
+    .dark .bg-gray-200 {
+      background-color: #4b5563;
+    }
+    
+    .dark .bg-gray-500 {
+      background-color: #6b7280;
+    }
+    
+    .dark .bg-blue-50 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-blue-100 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-green-50 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-green-100 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-red-50 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-red-100 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-yellow-50 {
+      background-color: #92400e;
+    }
+    
+    .dark .bg-yellow-100 {
+      background-color: #92400e;
+    }
+    
+    .dark .bg-purple-50 {
+      background-color: #5b21b6;
+    }
+    
+    .dark .bg-purple-100 {
+      background-color: #5b21b6;
+    }
+    
+    .dark .text-gray-400 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f3f4f6;
+    }
+    
+    .dark .text-gray-800 {
+      color: #f9fafb;
+    }
+    
+    .dark .border-gray-200 {
+      border-color: #374151;
+    }
+    
+    .dark .border-gray-300 {
+      border-color: #4b5563;
+    }
+    
+    .dark .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 深色模式下的light背景色 */
+    .dark .bg-light {
+      background-color: #374151;
+      color: #f3f4f6;
+    }
+    
+    /* 深色模式下的模态框 */
+    .dark #modal .bg-white {
+      background-color: #1f2937;
+    }
+    
+    /* 深色模式下的Toast提示 */
+    .dark #toast {
+      background-color: #374151;
+    }
+    
+    /* 深色模式切换动画 */
+    .dark-transition {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* 隐私设置页面样式 */
+    .privacy-section {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .dark .privacy-section {
+      border-bottom-color: #374151;
+    }
+    
+    .privacy-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #1f2937;
+    }
+    
+    .dark .privacy-title {
+      color: #f3f4f6;
+    }
+    
+    .privacy-content {
+      color: #4b5563;
+      line-height: 1.6;
+    }
+    
+    .dark .privacy-content {
+      color: #d1d5db;
+    }
+    
+    .privacy-list {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin: 1rem 0;
+    }
+    
+    .privacy-list li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .setting-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .dark .setting-toggle {
+      border-bottom-color: #374151;
+    }
+    
+    .setting-label {
+      display: flex;
+      align-items: center;
+    }
+    
+    .setting-icon {
+      margin-right: 0.75rem;
+      color: #1E88E5;
+    }
+    
+    .setting-text {
+      font-weight: 500;
+      color: #1f2937;
+    }
+    
+    .dark .setting-text {
+      color: #f3f4f6;
+    }
+    
+    .setting-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+    
+    .dark .setting-description {
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans dark-transition">
+  <!-- 主容器 -->
+  <div class="min-h-screen flex flex-col max-w-md mx-auto bg-white shadow-lg overflow-hidden">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+      <!-- 返回按钮 -->
+      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer" onclick="window.history.back()">
+        <i class="fa fa-arrow-left text-gray-600 text-xl"></i>
+      </button>
+      
+      <!-- 标题 -->
+      <h1 class="text-lg font-semibold text-gray-800">隐私设置</h1>
+      
+      <!-- 占位按钮 -->
+      <div class="w-8 h-8"></div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-1 p-4 overflow-y-auto">
+      <!-- 隐私设置选项 -->
+      <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">隐私设置</h2>
+        
+        <!-- 数据收集设置 -->
+        <div class="setting-toggle">
+          <div class="setting-label">
+            <div class="setting-icon">
+              <i class="fa fa-database text-primary"></i>
+            </div>
+            <div>
+              <div class="setting-text">数据收集</div>
+              <div class="setting-description">允许应用收集您的健康数据以提供更好的服务</div>
+            </div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="dataCollectionToggle" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+        
+        <!-- 位置信息设置 -->
+        <div class="setting-toggle">
+          <div class="setting-label">
+            <div class="setting-icon">
+              <i class="fa fa-map-marker text-primary"></i>
+            </div>
+            <div>
+              <div class="setting-text">位置信息</div>
+              <div class="setting-description">允许应用获取您的位置信息以提供附近医院和药店服务</div>
+            </div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="locationToggle" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+        
+        <!-- 健康数据共享设置 -->
+        <div class="setting-toggle">
+          <div class="setting-label">
+            <div class="setting-icon">
+              <i class="fa fa-share-alt text-primary"></i>
+            </div>
+            <div>
+              <div class="setting-text">健康数据共享</div>
+              <div class="setting-description">允许与您的医生共享健康数据</div>
+            </div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="dataSharingToggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+        
+        <!-- 个性化推荐设置 -->
+        <div class="setting-toggle">
+          <div class="setting-label">
+            <div class="setting-icon">
+              <i class="fa fa-lightbulb-o text-primary"></i>
+            </div>
+            <div>
+              <div class="setting-text">个性化推荐</div>
+              <div class="setting-description">根据您的健康数据提供个性化的健康建议</div>
+            </div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="personalizationToggle" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+        
+        <!-- 清除数据按钮 -->
+        <div class="mt-6">
+          <button id="clearDataBtn" class="w-full py-3 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-all-300">
+            <i class="fa fa-trash mr-1"></i> 清除所有健康数据
+          </button>
+        </div>
+      </div>
+      
+      <!-- 隐私管理条例 -->
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">隐私管理条例</h2>
+        
+        <div class="privacy-section">
+          <h3 class="privacy-title">1. 数据收集与使用</h3>
+          <div class="privacy-content">
+            <p>我们收集您提供的个人信息，包括但不限于您的姓名、年龄、性别、身高、体重、血型、医疗历史等健康相关信息。这些信息仅用于提供健康服务、生成健康报告、提供个性化建议以及改进我们的服务质量。</p>
+            <ul class="privacy-list">
+              <li>我们不会将您的个人健康数据出售给第三方。</li>
+              <li>我们可能会将匿名化的健康数据用于医学研究和统计分析。</li>
+              <li>在获得您的明确许可后，我们可能会与您指定的医疗服务提供者共享您的健康数据。</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="privacy-section">
+          <h3 class="privacy-title">2. 数据存储与保护</h3>
+          <div class="privacy-content">
+            <p>我们采用行业标准的安全措施保护您的数据免受未授权访问、使用或泄露。您的数据存储在加密的服务器上，只有经过授权的人员才能访问。</p>
+            <ul class="privacy-list">
+              <li>您可以随时查看、修改或删除您的个人健康数据。</li>
+              <li>我们会定期备份您的数据，以防止数据丢失。</li>
+              <li>在您删除账户后，我们将在合理的时间内删除您的所有个人数据。</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="privacy-section">
+          <h3 class="privacy-title">3. 位置信息</h3>
+          <div class="privacy-content">
+            <p>我们可能会收集您的位置信息，以提供附近医院、药店等本地化服务。您可以随时在设备设置中关闭位置权限。</p>
+          </div>
+        </div>
+        
+        <div class="privacy-section">
+          <h3 class="privacy-title">4. 隐私政策更新</h3>
+          <div class="privacy-content">
+            <p>我们可能会不时更新本隐私政策。当我们进行重大更改时，我们将通过应用内通知或其他方式通知您，并在应用中提供更新后的隐私政策。</p>
+          </div>
+        </div>
+        
+        <div class="privacy-section">
+          <h3 class="privacy-title">5. 联系我们</h3>
+          <div class="privacy-content">
+            <p>如果您对我们的隐私政策有任何疑问或建议，请通过以下方式联系我们：</p>
+            <ul class="privacy-list">
+              <li>电子邮件：privacy@healthapp.com</li>
+              <li>客服电话：400-123-4567</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="setting-toggle cursor-pointer" onclick="window.location.href='about.html'">
+          <div class="setting-label">
+            <div class="setting-icon">
+              <i class="fa fa-info-circle text-primary"></i>
+            </div>
+            <div>
+              <div class="setting-text">关于我们</div>
+              <div class="setting-description">了解应用和开发团队的更多信息</div>
+            </div>
+          </div>
+          <i class="fa fa-chevron-right text-gray-400"></i>
+        </div>
+        
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-500">最后更新日期：2025年11月28日</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <nav class="bg-white shadow-lg rounded-t-3xl mx-2 mb-2 p-2">
+      <div class="flex justify-around">
+        <button class="flex flex-col items-center p-2 flex-1 text-primary" onclick="window.location.href='index.html'">
+          <i class="fa fa-home text-xl"></i>
+          <span class="text-xs mt-1">首页</span>
+        </button>
+        <button class="flex flex-col items-center p-2 flex-1 text-gray-400" onclick="window.location.href='record.html'">
+          <i class="fa fa-heartbeat text-xl"></i>
+          <span class="text-xs mt-1">健康记录</span>
+        </button>
+        <button class="flex flex-col items-center p-2 flex-1 text-gray-400" onclick="window.location.href='profile.html'">
+          <i class="fa fa-user text-xl"></i>
+          <span class="text-xs mt-1">我的</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+  
+  <!-- 确认对话框 -->
+  <div id="confirmDialog" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5/6 max-w-md bg-white rounded-xl shadow-xl p-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">确认清除数据</h3>
+      <p class="text-gray-600 mb-6">您确定要清除所有健康数据吗？此操作不可撤销。</p>
+      <div class="flex space-x-3">
+        <button id="cancelClearBtn" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all-300">
+          取消
+        </button>
+        <button id="confirmClearBtn" class="flex-1 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all-300">
+          确认清除
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast提示 -->
+  <div id="toast" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg z-50 hidden">
+    操作成功
+  </div>
+  
+  <script>
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 应用深色模式
+      const isDarkModeEnabled = localStorage.getItem('darkModeEnabled') === 'true';
+      if (isDarkModeEnabled) {
+        document.documentElement.classList.add('dark');
+      }
+      
+      // 加载隐私设置
+      loadPrivacySettings();
+      
+      // 绑定事件
+      bindEvents();
+    });
+    
+    // 加载隐私设置
+    function loadPrivacySettings() {
+      const privacySettings = JSON.parse(localStorage.getItem('privacySettings')) || {
+        dataCollection: true,
+        location: true,
+        dataSharing: false,
+        personalization: true
+      };
+      
+      document.getElementById('dataCollectionToggle').checked = privacySettings.dataCollection;
+      document.getElementById('locationToggle').checked = privacySettings.location;
+      document.getElementById('dataSharingToggle').checked = privacySettings.dataSharing;
+      document.getElementById('personalizationToggle').checked = privacySettings.personalization;
+    }
+    
+    // 保存隐私设置
+    function savePrivacySettings() {
+      const privacySettings = {
+        dataCollection: document.getElementById('dataCollectionToggle').checked,
+        location: document.getElementById('locationToggle').checked,
+        dataSharing: document.getElementById('dataSharingToggle').checked,
+        personalization: document.getElementById('personalizationToggle').checked
+      };
+      
+      localStorage.setItem('privacySettings', JSON.stringify(privacySettings));
+      showToast('隐私设置已更新');
+    }
+    
+    // 绑定事件
+    function bindEvents() {
+      // 设置开关事件
+      document.getElementById('dataCollectionToggle').addEventListener('change', savePrivacySettings);
+      document.getElementById('locationToggle').addEventListener('change', savePrivacySettings);
+      document.getElementById('dataSharingToggle').addEventListener('change', savePrivacySettings);
+      document.getElementById('personalizationToggle').addEventListener('change', savePrivacySettings);
+      
+      // 清除数据按钮事件
+      document.getElementById('clearDataBtn').addEventListener('click', function() {
+        document.getElementById('confirmDialog').classList.remove('hidden');
+      });
+      
+      // 取消清除按钮事件
+      document.getElementById('cancelClearBtn').addEventListener('click', function() {
+        document.getElementById('confirmDialog').classList.add('hidden');
+      });
+      
+      // 确认清除按钮事件
+      document.getElementById('confirmClearBtn').addEventListener('click', function() {
+        clearAllHealthData();
+        document.getElementById('confirmDialog').classList.add('hidden');
+      });
+    }
+    
+    // 清除所有健康数据
+    function clearAllHealthData() {
+      // 清除健康记录
+      localStorage.removeItem('medicalRecords');
+      
+      // 清除体温记录
+      localStorage.removeItem('temperatureRecords');
+      
+      // 清除提醒
+      localStorage.removeItem('reminders');
+      
+      // 显示提示
+      showToast('所有健康数据已清除');
+    }
+    
+    // 显示Toast提示
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>体重管理：从健康意识到科学实践 - 医疗健康助手</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        accent: '#2563eb',
+                        dark: {
+                            100: '#1e293b',
+                            200: '#0f172a',
+                            300: '#020617'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .article-content p {
+                @apply my-4 leading-relaxed;
+            }
+            .article-content h2 {
+                @apply text-xl font-bold mt-8 mb-4 text-primary dark:text-secondary;
+            }
+            .article-content h3 {
+                @apply text-lg font-semibold mt-6 mb-3 text-primary dark:text-secondary;
+            }
+            .article-content ul, .article-content ol {
+                @apply my-4 ml-6;
+            }
+            .article-content ul {
+                @apply list-disc;
+            }
+            .article-content ol {
+                @apply list-decimal;
+            }
+            .article-content li {
+                @apply my-1;
+            }
+            .article-content a {
+                @apply text-primary dark:text-secondary underline hover:no-underline;
+            }
+            .article-content blockquote {
+                @apply border-l-4 border-primary dark:border-secondary pl-4 italic my-4 text-gray-600 dark:text-gray-400;
+            }
+            .article-content img {
+                @apply my-6 rounded-lg shadow-md max-w-full h-auto;
+            }
+            .related-article-card {
+                transition: all 0.3s ease;
+            }
+            .related-article-card:hover {
+                transform: translateY(-5px);
+            }
+            .comment-card {
+                transition: all 0.3s ease;
+            }
+            .comment-card:hover {
+                background-color: rgba(59, 130, 246, 0.05);
+            }
+        }
+    </style>
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 深色模式滚动条 */
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* 页面过渡动画 */
+        .page-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 分享按钮动画 */
+        .share-button {
+            transition: all 0.3s ease;
+        }
+        
+        .share-button:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* 点赞按钮动画 */
+        .like-button {
+            transition: all 0.3s ease;
+        }
+        
+        .like-button.active {
+            color: #ef4444;
+        }
+        
+        .like-button.active i {
+            animation: heartBeat 0.3s ease;
+        }
+        
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 评论输入框动画 */
+        .comment-input {
+            transition: all 0.3s ease;
+        }
+        
+        .comment-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* 相关文章卡片动画 */
+        .related-article-card {
+            transition: all 0.3s ease;
+        }
+        
+        .related-article-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-200 dark:text-gray-200 page-transition">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white dark:bg-dark-100 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="backButton" class="mr-3 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-primary dark:text-secondary">健康资讯详情</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300">
+                    <i class="fa fa-moon-o text-xl dark:hidden"></i>
+                    <i class="fa fa-sun-o text-xl hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 文章内容 -->
+        <article class="bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden mb-8">
+            <!-- 文章头部 -->
+            <div class="p-6">
+                <h1 class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-white">体重管理：从健康意识到科学实践</h1>
+                
+                <!-- 作者信息 -->
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                        <i class="fa fa-user-md text-primary dark:text-secondary"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center">
+                            <span class="font-medium text-gray-800 dark:text-white">陈君石 院士</span>
+                            <span class="ml-2 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full">专家</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            <span>中国工程院院士</span>
+                            <span class="mx-2">·</span>
+                            <span>2024年12月31日</span>
+                            <span class="mx-2">·</span>
+                            <span>10分钟阅读</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文章摘要 -->
+                <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-6">
+                    <p class="text-gray-700 dark:text-gray-300 italic">
+                        超重和肥胖是多种疾病的独立危险因素，会增加多种慢性病患病的风险。本文将从健康意识、科学评估、饮食调整、运动计划和心理调适五个方面，全面介绍体重管理的科学方法和实践策略。
+                    </p>
+                </div>
+                
+                <!-- 文章内容 -->
+                <div class="article-content text-gray-700 dark:text-gray-300">
+                    <p>
+                        2024-2025跨年科普活动上，"体重管理"被宣布为年度关注话题。过去常说超重肥胖防控，是把肥胖作为一种疾病来对待，而体重管理的提出体现了从以治病为中心向以健康为中心的转变。
+                    </p>
+                    
+                    <h2>一、认识体重管理的重要性</h2>
+                    
+                    <p>
+                        体重管理不仅仅是为了美观，更是为了健康。世界卫生组织研究表明，在影响健康的各类因素中，生活方式和行为因素的影响最大，其贡献率占到60%。而体重是反映生活方式健康与否的重要指标之一。
+                    </p>
+                    
+                    <p>
+                        超重和肥胖会增加多种慢性病的患病风险，包括：
+                    </p>
+                    
+                    <ul>
+                        <li>心脑血管疾病：如高血压、冠心病、脑卒中等</li>
+                        <li>代谢性疾病：如2型糖尿病、高血脂等</li>
+                        <li>某些癌症：如乳腺癌、结直肠癌、肝癌等</li>
+                        <li>骨骼肌肉疾病：如骨关节炎等</li>
+                        <li>呼吸系统疾病：如睡眠呼吸暂停综合征等</li>
+                    </ul>
+                    
+                    <blockquote>
+                        数据显示，我国成人超重率已达34.3%，肥胖率达16.4%，超重和肥胖已成为影响我国居民健康的重要公共卫生问题。
+                    </blockquote>
+                    
+                    <h2>二、科学评估体重状况</h2>
+                    
+                    <p>
+                        在开始体重管理之前，首先需要科学评估自己的体重状况。常用的评估指标包括：
+                    </p>
+                    
+                    <h3>1. 体重指数（BMI）</h3>
+                    
+                    <p>
+                        体重指数是国际通用的评估人体胖瘦程度以及健康风险的指标，计算公式为：
+                    </p>
+                    
+                    <p class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-center font-medium">
+                        BMI = 体重（kg）÷ 身高²（m²）
+                    </p>
+                    
+                    <p>
+                        根据我国标准，BMI的判断标准如下：
+                    </p>
+                    
+                    <ul>
+                        <li>偏瘦：BMI &lt; 18.5</li>
+                        <li>正常：18.5 ≤ BMI &lt; 24</li>
+                        <li>超重：24 ≤ BMI &lt; 28</li>
+                        <li>肥胖：BMI ≥ 28</li>
+                    </ul>
+                    
+                    <h3>2. 腰围</h3>
+                    
+                    <p>
+                        腰围是反映腹部脂肪堆积的指标，与多种慢性病风险密切相关。测量方法是：
+                    </p>
+                    
+                    <ol>
+                        <li>站立，双脚分开与肩同宽</li>
+                        <li>用软尺水平环绕腰部，测量位置在肚脐上方2厘米处</li>
+                        <li>测量时不要收腹，保持正常呼吸</li>
+                    </ol>
+                    
+                    <p>
+                        我国成人腰围的判断标准如下：
+                    </p>
+                    
+                    <ul>
+                        <li>男性：腰围 ≥ 85厘米为超标</li>
+                        <li>女性：腰围 ≥ 80厘米为超标</li>
+                    </ul>
+                    
+                    <h2>三、科学的饮食调整策略</h2>
+                    
+                    <p>
+                        饮食调整是体重管理的核心环节，但绝不是简单的节食。科学的饮食调整应该遵循以下原则：
+                    </p>
+                    
+                    <h3>1. 控制总能量摄入</h3>
+                    
+                    <p>
+                        体重管理的基本原理是能量平衡，即消耗的能量大于摄入的能量。建议每天减少300-500千卡的能量摄入，但不要低于基础代谢所需能量。
+                    </p>
+                    
+                    <h3>2. 均衡营养搭配</h3>
+                    
+                    <p>
+                        饮食调整不应牺牲营养均衡，应确保各类营养素的充足摄入：
+                    </p>
+                    
+                    <ul>
+                        <li>蛋白质：占总能量的15-20%，优先选择优质蛋白质如鱼、禽、蛋、瘦肉、豆制品等</li>
+                        <li>脂肪：占总能量的20-30%，减少饱和脂肪和反式脂肪的摄入，增加不饱和脂肪的摄入</li>
+                        <li>碳水化合物：占总能量的50-60%，优先选择全谷物、杂豆类、薯类等优质碳水化合物</li>
+                        <li>维生素和矿物质：保证充足的蔬菜水果摄入，每天至少摄入500克蔬菜和200-350克水果</li>
+                    </ul>
+                    
+                    <h3>3. 合理的饮食行为</h3>
+                    
+                    <ul>
+                        <li>规律饮食：三餐定时定量，避免暴饮暴食</li>
+                        <li>细嚼慢咽：每口食物咀嚼15-20次，有助于增加饱腹感</li>
+                        <li>控制进食速度：每餐进食时间不少于20分钟</li>
+                        <li>减少高能量密度食物的摄入：如油炸食品、甜食、含糖饮料等</li>
+                        <li>增加膳食纤维摄入：有助于增加饱腹感，促进肠道蠕动</li>
+                    </ul>
+                    
+                    <h2>四、科学的运动计划</h2>
+                    
+                    <p>
+                        运动是体重管理的重要组成部分，不仅能消耗能量，还能增加肌肉量，提高基础代谢率。科学的运动计划应包括：
+                    </p>
+                    
+                    <h3>1. 有氧运动</h3>
+                    
+                    <p>
+                        有氧运动是消耗能量的主要方式，建议：
+                    </p>
+                    
+                    <ul>
+                        <li>每周至少进行150分钟中等强度的有氧运动，或75分钟高强度的有氧运动</li>
+                        <li>有氧运动类型：快走、慢跑、游泳、骑自行车、跳操等</li>
+                        <li>运动强度：中等强度运动时，心率达到最大心率的60-70%（最大心率=220-年龄）</li>
+                    </ul>
+                    
+                    <h3>2. 力量训练</h3>
+                    
+                    <p>
+                        力量训练可以增加肌肉量，提高基础代谢率，建议：
+                    </p>
+                    
+                    <ul>
+                        <li>每周至少进行2次力量训练，覆盖主要肌群</li>
+                        <li>力量训练类型：举重、俯卧撑、仰卧起坐、深蹲等</li>
+                        <li>训练强度：每个动作进行2-3组，每组8-12次重复</li>
+                    </ul>
+                    
+                    <h3>3. 日常活动增加</h3>
+                    
+                    <p>
+                        除了专门的运动，增加日常活动量也很重要：
+                    </p>
+                    
+                    <ul>
+                        <li>减少久坐时间，每小时起身活动5-10分钟</li>
+                        <li>选择楼梯而非电梯</li>
+                        <li>短距离出行选择步行或骑行</li>
+                        <li>增加家务劳动量</li>
+                    </ul>
+                    
+                    <h2>五、心理调适与行为改变</h2>
+                    
+                    <p>
+                        体重管理是一个长期的过程，需要良好的心理状态和行为习惯的支持：
+                    </p>
+                    
+                    <h3>1. 设定合理目标</h3>
+                    
+                    <p>
+                        设定合理的体重管理目标非常重要，建议：
+                    </p>
+                    
+                    <ul>
+                        <li>短期目标：每周减重0.5-1公斤</li>
+                        <li>长期目标：在6-12个月内减重5-10%</li>
+                        <li>除了体重，还可以设定其他目标，如腰围减少、运动能力提高等</li>
+                    </ul>
+                    
+                    <h3>2. 建立支持系统</h3>
+                    
+                    <p>
+                        体重管理过程中，家人、朋友的支持非常重要。可以：
+                    </p>
+                    
+                    <ul>
+                        <li>寻找体重管理伙伴，互相鼓励和监督</li>
+                        <li>参加体重管理小组或线上社区</li>
+                        <li>寻求专业人士的帮助，如医生、营养师、健身教练等</li>
+                    </ul>
+                    
+                    <h3>3. 应对挫折和反弹</h3>
+                    
+                    <p>
+                        体重管理过程中难免会遇到挫折和体重反弹，关键是如何应对：
+                    </p>
+                    
+                    <ul>
+                        <li>不要因为短期的挫折而放弃长期的目标</li>
+                        <li>分析挫折原因，调整策略而非完全放弃</li>
+                        <li>保持积极的心态，相信自己的能力</li>
+                    </ul>
+                    
+                    <h2>六、特殊人群的体重管理</h2>
+                    
+                    <p>
+                        不同人群的体重管理策略有所不同，需要特别注意：
+                    </p>
+                    
+                    <h3>1. 老年人</h3>
+                    
+                    <p>
+                        老年人的体重管理应更加谨慎，避免过度减重：
+                    </p>
+                    
+                    <ul>
+                        <li>老年人适当超重可能对健康有益，可以降低死亡率</li>
+                        <li>老年人减重应以改善身体成分（增加肌肉量，减少脂肪量）为目标</li>
+                        <li>老年人运动应更加注重安全性，避免跌倒和运动损伤</li>
+                    </ul>
+                    
+                    <h3>2. 儿童青少年</h3>
+                    
+                    <p>
+                        儿童青少年的体重管理应以促进健康成长为目标：
+                    </p>
+                    
+                    <ul>
+                        <li>儿童青少年正处于生长发育阶段，不应过度限制饮食</li>
+                        <li>儿童青少年体重管理应以增加运动量、改善饮食结构为主要手段</li>
+                        <li>家庭和学校应共同营造健康的生活环境</li>
+                    </ul>
+                    
+                    <h3>3. 孕妇和哺乳期妇女</h3>
+                    
+                    <p>
+                        孕妇和哺乳期妇女的体重管理应在医生指导下进行：
+                    </p>
+                    
+                    <ul>
+                        <li>孕期应适当增加体重，而非减重</li>
+                        <li>孕期增重应控制在合理范围内，一般为11-16公斤</li>
+                        <li>哺乳期妇女不应过度减重，以免影响乳汁质量和产量</li>
+                    </ul>
+                    
+                    <h2>七、体重管理的常见误区</h2>
+                    
+                    <p>
+                        体重管理过程中，有一些常见的误区需要避免：
+                    </p>
+                    
+                    <h3>1. 过度节食</h3>
+                    
+                    <p>
+                        过度节食虽然短期内可能减重，但会导致：
+                    </p>
+                    
+                    <ul>
+                        <li>营养不良，影响身体健康</li>
+                        <li>基础代谢率下降，反而不利于长期体重管理</li>
+                        <li>容易导致体重反弹</li>
+                    </ul>
+                    
+                    <h3>2. 单一食物减重法</h3>
+                    
+                    <p>
+                        依赖单一食物减重，如只吃水果、只吃蔬菜等，会导致：
+                    </p>
+                    
+                    <ul>
+                        <li>营养不均衡</li>
+                        <li>难以长期坚持</li>
+                        <li>体重容易反弹</li>
+                    </ul>
+                    
+                    <h3>3. 忽视力量训练</h3>
+                    
+                    <p>
+                        只进行有氧运动而忽视力量训练，会导致：
+                    </p>
+                    
+                    <ul>
+                        <li>肌肉量减少</li>
+                        <li>基础代谢率下降</li>
+                        <li>体重反弹风险增加</li>
+                    </ul>
+                    
+                    <h2>八、结语</h2>
+                    
+                    <p>
+                        体重管理是一个长期的过程，需要科学的方法、坚定的决心和持续的努力。通过合理的饮食调整、科学的运动计划和良好的心理状态，每个人都可以实现健康的体重管理目标，提高生活质量，预防慢性疾病。
+                    </p>
+                    
+                    <p>
+                        记住，健康是最重要的财富，而体重管理是维护健康的重要手段之一。让我们从现在开始，关注自己的体重，关注自己的健康，为自己和家人的健康未来努力！
+                    </p>
+                </div>
+                
+                <!-- 文章标签 -->
+                <div class="mt-8 flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full">体重管理</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full">健康生活方式</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full">慢性疾病预防</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full">科学饮食</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full">运动健康</span>
+                </div>
+                
+                <!-- 文章互动按钮 -->
+                <div class="mt-8 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button id="likeButton" class="like-button flex items-center text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                            <i class="fa fa-heart-o text-xl mr-2"></i>
+                            <span id="likeCount">245</span>
+                            <span class="ml-1">点赞</span>
+                        </button>
+                        
+                        <button id="bookmarkButton" class="flex items-center text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                            <i class="fa fa-bookmark-o text-xl mr-2"></i>
+                            <span>收藏</span>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <span class="text-gray-500 dark:text-gray-400 text-sm">分享到：</span>
+                        
+                        <button class="share-button w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800">
+                            <i class="fa fa-weixin"></i>
+                        </button>
+                        
+                        <button class="share-button w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800">
+                            <i class="fa fa-weibo"></i>
+                        </button>
+                        
+                        <button class="share-button w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800">
+                            <i class="fa fa-qq"></i>
+                        </button>
+                        
+                        <button class="share-button w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800">
+                            <i class="fa fa-link"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        
+        <!-- 相关文章推荐 -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold mb-6">相关文章推荐</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- 相关文章1 -->
+                <div class="related-article-card bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden">
+                    <div class="h-40 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <i class="fa fa-heartbeat text-5xl text-primary dark:text-secondary"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold mb-2 line-clamp-2">心脑血管疾病：警惕寒冷带来的风险</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">北京大学第一医院副院长 李建平</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">每当气温骤降的时候，心梗脑梗病人就会增多。冷空气会使血管收缩，发生血管痉挛，如果血管上存在斑块导致血管狭窄...</p>
+                    </div>
+                </div>
+                
+                <!-- 相关文章2 -->
+                <div class="related-article-card bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden">
+                    <div class="h-40 bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <i class="fa fa-apple text-5xl text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold mb-2 line-clamp-2">科学饮食：健康生活的基石</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">中国营养学会 专家团队</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">合理膳食是健康生活方式的重要组成部分，本文将从食物多样性、均衡营养、饮食行为等方面，全面介绍科学饮食的知识...</p>
+                    </div>
+                </div>
+                
+                <!-- 相关文章3 -->
+                <div class="related-article-card bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden">
+                    <div class="h-40 bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                        <i class="fa fa-bed text-5xl text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold mb-2 line-clamp-2">睡眠质量比睡眠时长更重要</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">北京大学人民医院 韩芳 教授</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">睡得好是指睡过以后能精力恢复，第二天能全神贯注投入工作和生活，其中有睡眠够长、质量够好、睡眠有规律三个重要维度...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 评论区 -->
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="p-6">
+                <h2 class="text-xl font-bold mb-6">评论区</h2>
+                
+                <!-- 评论输入框 -->
+                <div class="mb-6">
+                    <textarea id="commentInput" class="comment-input w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-dark-100 focus:outline-none" rows="4" placeholder="分享你的观点或经验..."></textarea>
+                    <div class="flex justify-end mt-3">
+                        <button id="submitComment" class="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors duration-300">
+                            发表评论
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 评论列表 -->
+                <div id="commentList" class="space-y-6">
+                    <!-- 评论1 -->
+                    <div class="comment-card p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3">
+                                <i class="fa fa-user text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="font-medium">健康达人</span>
+                                        <span class="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full">2天前</span>
+                                    </div>
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                                <p class="mt-2 text-gray-700 dark:text-gray-300">
+                                    这篇文章写得非常全面，科学又实用。我一直在尝试减重，但总是反弹，看了这篇文章才明白，原来我之前的方法有很多误区。特别是关于力量训练的部分，以前只注重有氧运动，现在知道力量训练同样重要。
+                                </p>
+                                <div class="flex items-center mt-3">
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary mr-4">
+                                        <i class="fa fa-thumbs-o-up mr-1"></i>
+                                        <span>45</span>
+                                    </button>
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-comment-o mr-1"></i>
+                                        <span>回复</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 评论2 -->
+                    <div class="comment-card p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3">
+                                <i class="fa fa-user-md text-green-600 dark:text-green-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="font-medium">营养师王医生</span>
+                                        <span class="ml-2 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full">专家</span>
+                                        <span class="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full">3天前</span>
+                                    </div>
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                                <p class="mt-2 text-gray-700 dark:text-gray-300">
+                                    作为一名营养师，我非常赞同文章中的观点。体重管理确实是一个系统工程，需要饮食、运动和心理的综合管理。特别是对于有基础疾病的人群，体重管理应该在专业人士指导下进行，避免盲目减重带来的健康风险。
+                                </p>
+                                <div class="flex items-center mt-3">
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary mr-4">
+                                        <i class="fa fa-thumbs-o-up mr-1"></i>
+                                        <span>32</span>
+                                    </button>
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-comment-o mr-1"></i>
+                                        <span>回复</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- 回复 -->
+                                <div class="mt-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-2">
+                                            <i class="fa fa-user text-blue-600 dark:text-blue-400 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center">
+                                                <span class="font-medium">减肥小白</span>
+                                                <span class="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full">2天前</span>
+                                            </div>
+                                            <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                                王医生您好，我想请教一下，对于上班族来说，时间比较紧张，有没有什么简单易行的体重管理方法？
+                                            </p>
+                                            <div class="flex items-center mt-2">
+                                                <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary mr-4">
+                                                    <i class="fa fa-thumbs-o-up mr-1"></i>
+                                                    <span>15</span>
+                                                </button>
+                                                <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                                    <i class="fa fa-comment-o mr-1"></i>
+                                                    <span>回复</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- 回复的回复 -->
+                                            <div class="mt-3 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                                                <div class="flex items-start">
+                                                    <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-2">
+                                                        <i class="fa fa-user-md text-green-600 dark:text-green-400 text-sm"></i>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <div class="flex items-center">
+                                                            <span class="font-medium">营养师王医生</span>
+                                                            <span class="ml-2 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full">专家</span>
+                                                            <span class="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full">2天前</span>
+                                                        </div>
+                                                        <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                                            对于上班族，我建议可以利用碎片化时间进行运动，比如上下班提前一站下车步行，午休时间进行15-20分钟的简单运动。饮食方面，可以准备健康的便当，避免外卖中的高油高盐食物。最重要的是保持规律作息，避免熬夜。
+                                                        </p>
+                                                        <div class="flex items-center mt-2">
+                                                            <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary mr-4">
+                                                                <i class="fa fa-thumbs-o-up mr-1"></i>
+                                                                <span>28</span>
+                                                            </button>
+                                                            <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                                                <i class="fa fa-comment-o mr-1"></i>
+                                                                <span>回复</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 评论3 -->
+                    <div class="comment-card p-4">
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-3">
+                                <i class="fa fa-user text-purple-600 dark:text-purple-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="font-medium">健身爱好者</span>
+                                        <span class="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full">5天前</span>
+                                    </div>
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                                <p class="mt-2 text-gray-700 dark:text-gray-300">
+                                    文章中提到的力量训练确实很重要，我想补充一点，对于初学者来说，力量训练最好在专业人士指导下进行，避免动作不规范导致的运动损伤。另外，运动后的拉伸和恢复同样重要，可以帮助减少肌肉酸痛，提高运动效果。
+                                </p>
+                                <div class="flex items-center mt-3">
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary mr-4">
+                                        <i class="fa fa-thumbs-o-up mr-1"></i>
+                                        <span>23</span>
+                                    </button>
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-comment-o mr-1"></i>
+                                        <span>回复</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 加载更多评论 -->
+                <div class="text-center mt-8">
+                    <button id="loadMoreComments" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 font-medium rounded-lg transition-colors duration-300">
+                        加载更多评论
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-100 shadow-lg z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-around py-3">
+                <a href="index.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-home text-xl"></i>
+                    <span class="text-xs mt-1">首页</span>
+                </a>
+                <a href="record.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-file-text text-xl"></i>
+                    <span class="text-xs mt-1">记录</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-user text-xl"></i>
+                    <span class="text-xs mt-1">我的</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast提示 -->
+    <div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 opacity-0 transition-opacity duration-300">
+        提示内容
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 文章数据
+        const articles = {
+            1: {
+                title: "冬季流感预防指南",
+                author: "王医生",
+                authorTitle: "呼吸科主任医师",
+                date: "2025-11-20",
+                readTime: "5分钟阅读",
+                summary: "了解如何在冬季有效预防流感，保护自己和家人的健康。",
+                content: `
+                    <p>冬季是流感的高发季节，尤其是在寒冷干燥的气候条件下，流感病毒更容易传播。本文将从流感的基本知识、预防措施、症状识别和应对策略四个方面，为您提供全面的冬季流感预防指南。</p>
+                    
+                    <h2>一、流感的基本知识</h2>
+                    
+                    <p>流感是由流感病毒引起的急性呼吸道传染病，主要通过飞沫传播，也可通过接触传播。流感病毒分为甲、乙、丙三型，其中甲型流感病毒变异频繁，容易引起大流行。</p>
+                    
+                    <p>流感的潜伏期一般为1-4天，平均为2天。患者在发病前1天至发病后5天内均具有传染性，儿童和免疫力低下者的传染期可能更长。</p>
+                    
+                    <h2>二、流感的预防措施</h2>
+                    
+                    <h3>1. 接种流感疫苗</h3>
+                    
+                    <p>接种流感疫苗是预防流感最有效的方法之一。建议以下人群优先接种：</p>
+                    
+                    <ul>
+                        <li>65岁以上的老年人</li>
+                        <li>6个月至5岁的儿童</li>
+                        <li>孕妇</li>
+                        <li>慢性病患者（如哮喘、糖尿病、心脏病等）</li>
+                        <li>医务人员</li>
+                    </ul>
+                    
+                    <p>流感疫苗的保护效果一般可持续6-8个月，建议每年接种一次。</p>
+                    
+                    <h3>2. 注意个人卫生</h3>
+                    
+                    <ul>
+                        <li>勤洗手，使用肥皂和流动水洗手，或使用含酒精的免洗手消毒剂</li>
+                        <li>避免用手触摸眼睛、鼻子和嘴巴</li>
+                        <li>咳嗽或打喷嚏时，用纸巾或肘部内侧遮挡口鼻</li>
+                        <li>避免接触流感患者</li>
+                    </ul>
+                    
+                    <h3>3. 保持良好的生活习惯</h3>
+                    
+                    <ul>
+                        <li>均衡饮食，多吃蔬菜水果</li>
+                        <li>充足睡眠，避免熬夜</li>
+                        <li>适度运动，增强免疫力</li>
+                        <li>保持室内空气流通，定期开窗通风</li>
+                        <li>避免去人群密集的场所，尤其是在流感流行季节</li>
+                    </ul>
+                    
+                    <h2>三、流感症状的识别</h2>
+                    
+                    <p>流感的症状通常比普通感冒更严重，主要包括：</p>
+                    
+                    <ul>
+                        <li>发热（体温可达39-40℃）</li>
+                        <li>头痛、肌肉酸痛</li>
+                        <li>乏力、疲劳</li>
+                        <li>咳嗽、喉咙痛</li>
+                        <li>流鼻涕、鼻塞</li>
+                        <li>恶心、呕吐、腹泻（尤其在儿童中常见）</li>
+                    </ul>
+                    
+                    <p>如果出现上述症状，应及时就医，并在家休息，避免传染给他人。</p>
+                    
+                    <h2>四、流感的应对策略</h2>
+                    
+                    <h3>1. 及时就医</h3>
+                    
+                    <p>如果出现流感症状，应及时就医，医生会根据情况给予抗病毒药物治疗。抗病毒药物最好在发病48小时内使用，可有效减轻症状，缩短病程，并降低并发症的风险。</p>
+                    
+                    <h3>2. 居家休息</h3>
+                    
+                    <p>流感患者应在家休息，避免去学校、工作场所或其他公共场所，直到症状完全消失后至少24小时。</p>
+                    
+                    <h3>3. 注意补水和营养</h3>
+                    
+                    <p>流感期间应多喝水，保持身体水分充足。同时，应摄入易消化、营养丰富的食物，如粥、面条、鸡蛋、牛奶等，帮助身体恢复。</p>
+                    
+                    <h3>4. 缓解症状</h3>
+                    
+                    <p>可以使用退烧药（如对乙酰氨基酚、布洛芬）缓解发热和疼痛症状。咳嗽和喉咙痛可使用止咳药和含片缓解。</p>
+                    
+                    <h2>五、结语</h2>
+                    
+                    <p>冬季流感预防需要我们从多个方面入手，包括接种疫苗、注意个人卫生、保持良好的生活习惯等。同时，我们也需要了解流感的症状和应对策略，以便在出现症状时能够及时处理。</p>
+                    
+                    <p>希望本文提供的冬季流感预防指南能够帮助您和家人度过一个健康的冬季。</p>
+                `,
+                tags: ["流感预防", "冬季健康", "呼吸道疾病", "疫苗接种", "个人卫生"],
+                likeCount: 186
+            },
+            2: {
+                title: "健康饮食的五大原则",
+                author: "李营养师",
+                authorTitle: "临床营养师",
+                date: "2025-11-18",
+                readTime: "8分钟阅读",
+                summary: "均衡饮食是维持健康的基础，本文介绍健康饮食的五大原则。",
+                content: `
+                    <p>健康的饮食是维持身体健康的基础，也是预防慢性疾病的重要手段。本文将介绍健康饮食的五大原则，帮助您建立科学的饮食习惯。</p>
+                    
+                    <h2>一、食物多样性原则</h2>
+                    
+                    <p>食物多样性是健康饮食的基础。不同种类的食物含有不同的营养素，只有通过多样化的饮食，才能获得全面的营养。</p>
+                    
+                    <p>《中国居民膳食指南》建议：</p>
+                    
+                    <ul>
+                        <li>每天摄入谷薯类食物250-400克，其中全谷物和杂豆类应占50-150克</li>
+                        <li>每天摄入蔬菜300-500克，深色蔬菜应占一半以上</li>
+                        <li>每天摄入水果200-350克</li>
+                        <li>每天摄入鱼、禽、蛋、瘦肉共计120-200克</li>
+                        <li>每天摄入奶类300克或相当量的奶制品</li>
+                        <li>每天摄入大豆25-35克或相当量的豆制品</li>
+                    </ul>
+                    
+                    <p>同时，应注意食物的颜色多样性，不同颜色的食物含有不同的植物化学物，对健康有益。</p>
+                    
+                    <h2>二、均衡营养原则</h2>
+                    
+                    <p>均衡营养是指各种营养素的摄入比例要适当，既不过量也不缺乏。人体需要的营养素主要包括：</p>
+                    
+                    <h3>1. 碳水化合物</h3>
+                    
+                    <p>碳水化合物是人体最主要的能量来源，应占总能量的50-60%。建议选择全谷物、杂豆类、薯类等优质碳水化合物，限制精制碳水化合物的摄入。</p>
+                    
+                    <h3>2. 蛋白质</h3>
+                    
+                    <p>蛋白质是构成身体组织、酶、激素等的重要成分，应占总能量的10-15%。建议选择鱼、禽、蛋、瘦肉、奶类、豆制品等优质蛋白质。</p>
+                    
+                    <h3>3. 脂肪</h3>
+                    
+                    <p>脂肪是人体必需的营养素之一，应占总能量的20-30%。建议选择植物油、坚果、鱼油等富含不饱和脂肪酸的食物，限制饱和脂肪和反式脂肪的摄入。</p>
+                    
+                    <h3>4. 维生素和矿物质</h3>
+                    
+                    <p>维生素和矿物质虽然需求量不大，但对维持身体正常功能至关重要。应通过多样化的饮食获取足够的维生素和矿物质。</p>
+                    
+                    <h3>5. 膳食纤维</h3>
+                    
+                    <p>膳食纤维有助于促进肠道蠕动，预防便秘，降低心血管疾病风险。建议每天摄入25-30克膳食纤维，主要来源于全谷物、蔬菜、水果和豆类。</p>
+                    
+                    <h3>6. 水</h3>
+                    
+                    <p>水是生命之源，建议成年人每天饮用1500-1700毫升水，少量多次饮用。</p>
+                    
+                    <h2>三、适量原则</h2>
+                    
+                    <p>适量原则是指各种食物的摄入量要适当，既不过量也不缺乏。过量摄入会导致能量过剩，增加肥胖、高血压、糖尿病等慢性疾病的风险；而摄入不足则会导致营养不良，影响身体正常功能。</p>
+                    
+                    <p>建议根据个人的年龄、性别、体力活动水平等因素，合理安排饮食摄入量。</p>
+                    
+                    <h2>四、规律饮食原则</h2>
+                    
+                    <p>规律饮食是指一日三餐要定时定量，避免暴饮暴食或长时间饥饿。规律饮食有助于维持血糖稳定，促进消化吸收，预防消化系统疾病。</p>
+                    
+                    <p>建议：</p>
+                    
+                    <ul>
+                        <li>早餐要吃好，保证能量和营养的充足摄入</li>
+                        <li>午餐要吃饱，提供下午所需的能量</li>
+                        <li>晚餐要适量，避免影响睡眠</li>
+                        <li>两餐之间可适当加餐，选择水果、坚果等健康零食</li>
+                    </ul>
+                    
+                    <h2>五、个体化原则</h2>
+                    
+                    <p>个体化原则是指饮食方案应根据个人的健康状况、生活习惯、文化背景等因素进行调整。例如：</p>
+                    
+                    <ul>
+                        <li>孕妇和哺乳期妇女需要增加某些营养素的摄入</li>
+                        <li>老年人应适当增加钙、维生素D等营养素的摄入</li>
+                        <li>慢性病患者应根据病情调整饮食</li>
+                        <li>素食者应注意蛋白质、铁、维生素B12等营养素的补充</li>
+                    </ul>
+                    
+                    <h2>六、结语</h2>
+                    
+                    <p>健康饮食的五大原则是食物多样性、均衡营养、适量、规律饮食和个体化。通过遵循这些原则，我们可以建立科学的饮食习惯，维持身体健康，预防慢性疾病。</p>
+                    
+                    <p>最后，需要提醒的是，健康饮食是一个长期的过程，需要我们持之以恒地坚持。同时，如果您有特殊的健康状况或饮食需求，建议咨询医生或注册营养师的专业意见。</p>
+                `,
+                tags: ["健康饮食", "营养均衡", "食物多样性", "膳食指南", "健康生活方式"],
+                likeCount: 215
+            },
+            3: {
+                title: "适合中老年人的居家运动",
+                author: "张教练",
+                authorTitle: "健身教练",
+                date: "2025-11-15",
+                readTime: "6分钟阅读",
+                summary: "不需要出门，在家也能进行的适合中老年人的运动方式。",
+                content: `
+                    <p>随着年龄的增长，中老年人的身体机能逐渐下降，适当的运动对于维持身体健康、延缓衰老至关重要。本文将介绍几种适合中老年人的居家运动方式，不需要特殊设备，随时随地都可以进行。</p>
+                    
+                    <h2>一、中老年人运动的重要性</h2>
+                    
+                    <p>适当的运动对中老年人有以下益处：</p>
+                    
+                    <ul>
+                        <li>增强肌肉力量，提高基础代谢率</li>
+                        <li>改善心肺功能，降低心血管疾病风险</li>
+                        <li>增加骨密度，预防骨质疏松</li>
+                        <li>改善关节灵活性，预防关节炎</li>
+                        <li>促进血液循环，改善睡眠质量</li>
+                        <li>增强免疫力，预防疾病</li>
+                        <li>改善情绪，预防抑郁和焦虑</li>
+                    </ul>
+                    
+                    <p>中老年人在选择运动方式时，应遵循安全、适度、循序渐进的原则，避免剧烈运动和过度劳累。</p>
+                    
+                    <h2>二、适合中老年人的居家运动方式</h2>
+                    
+                    <h3>1. 散步</h3>
+                    
+                    <p>散步是最简单、最安全的运动方式之一，适合几乎所有中老年人。可以在室内或室外进行，不需要任何设备。</p>
+                    
+                    <p>建议：</p>
+                    
+                    <ul>
+                        <li>每天散步30-60分钟，可分为2-3次进行</li>
+                        <li>散步速度以舒适为宜，避免过快</li>
+                        <li>散步时保持挺胸抬头，双臂自然摆动</li>
+                        <li>可选择在饭后半小时进行散步，有助于消化</li>
+                    </ul>
+                    
+                    <h3>2. 太极拳</h3>
+                    
+                    <p>太极拳是一种传统的中国武术，动作缓慢、柔和，适合中老年人练习。太极拳不仅可以锻炼身体，还可以修身养性。</p>
+                    
+                    <p>建议：</p>
+                    
+                    <ul>
+                        <li>选择适合中老年人的简化太极拳套路，如24式太极拳</li>
+                        <li>练习时注意呼吸与动作的配合</li>
+                        <li>动作要缓慢、连贯，不要用力过猛</li>
+                        <li>每天练习15-30分钟</li>
+                    </ul>
+                    
+                    <h3>3. 八段锦</h3>
+                    
+                    <p>八段锦是一种传统的养生功法，由八个动作组成，简单易学，适合中老年人练习。八段锦可以调节呼吸，锻炼身体各部位。</p>
+                    
+                    <p>建议：</p>
+                    
+                    <ul>
+                        <li>按照正确的姿势练习每个动作</li>
+                        <li>练习时保持自然呼吸，不要憋气</li>
+                        <li>每个动作可重复多次，逐渐增加难度</li>
+                        <li>每天练习1-2次，每次10-15分钟</li>
+                    </ul>
+                    
+                    <h3>4. 坐姿伸展运动</h3>
+                    
+                    <p>坐姿伸展运动适合身体机能较差或行动不便的中老年人，可以在椅子上进行，主要锻炼柔韧性和关节活动度。</p>
+                    
+                    <p>常见的坐姿伸展运动包括：</p>
+                    
+                    <ul>
+                        <li>坐姿腿部伸展：坐在椅子上，伸直双腿，脚尖向身体方向勾</li>
+                        <li>坐姿手臂伸展：坐在椅子上，双臂向上伸展，双手交叉，向天花板方向伸展</li>
+                        <li>坐姿转体：坐在椅子上，双手放在身体两侧，缓慢向一侧转动身体</li>
+                        <li>坐姿肩部伸展：坐在椅子上，一只手臂横过胸前，用另一只手轻轻拉伸</li>
+                    </ul>
+                    
+                    <p>建议：</p>
+                    
+                    <ul>
+                        <li>每个动作保持10-15秒，重复3-5次</li>
+                        <li>伸展时动作要缓慢，避免过度拉伸</li>
+                        <li>根据自己的身体状况调整动作难度</li>
+                    </ul>
+                    
+                    <h3>5. 力量训练</h3>
+                    
+                    <p>中老年人进行适当的力量训练可以增加肌肉量，提高基础代谢率，预防骨质疏松。居家力量训练可以使用自身体重或简单的器械进行。</p>
+                    
+                    <p>适合中老年人的居家力量训练包括：</p>
+                    
+                    <ul>
+                        <li>坐姿抬腿：坐在椅子上，缓慢抬起一条腿，保持几秒钟后放下，换另一条腿</li>
+                        <li>站姿踮脚尖：站立，缓慢踮起脚尖，然后放下</li>
+                        <li>墙壁俯卧撑：面对墙壁站立，双手撑墙，缓慢弯曲手臂，然后伸直</li>
+                        <li>坐姿臂屈伸：坐在椅子上，双手撑在椅子两侧，缓慢抬起身体，然后放下</li>
+                    </ul>
+                    
+                    <p>建议：</p>
+                    
+                    <ul>
+                        <li>每个动作进行10-15次，重复2-3组</li>
+                        <li>训练时注意呼吸，避免憋气</li>
+                        <li>根据自己的身体状况调整动作难度和次数</li>
+                        <li>如有不适，应立即停止训练</li>
+                    </ul>
+                    
+                    <h2>三、中老年人运动的注意事项</h2>
+                    
+                    <p>中老年人在进行运动时，应注意以下事项：</p>
+                    
+                    <ul>
+                        <li>运动前应进行适当的热身活动，如散步、关节活动等</li>
+                        <li>运动时应穿着舒适、透气的运动服装和鞋子</li>
+                        <li>运动过程中应注意补充水分，避免脱水</li>
+                        <li>运动强度应适中，避免过度劳累</li>
+                        <li>如有不适，如头晕、胸痛、呼吸困难等，应立即停止运动</li>
+                        <li>运动后应进行适当的放松活动，如深呼吸、拉伸等</li>
+                        <li>慢性病患者在进行运动前应咨询医生的意见</li>
+                    </ul>
+                    
+                    <h2>四、结语</h2>
+                    
+                    <p>适当的运动对中老年人的健康至关重要。居家运动是一种方便、安全的运动方式，不需要出门，随时随地都可以进行。中老年人可以根据自己的身体状况和兴趣爱好，选择适合自己的运动方式，坚持锻炼，保持健康。</p>
+                    
+                    <p>最后，需要提醒的是，运动是一个循序渐进的过程，不要期望一蹴而就。中老年人应根据自己的身体状况，逐渐增加运动强度和时间，享受运动带来的健康和快乐。</p>
+                `,
+                tags: ["中老年人运动", "居家运动", "健康生活", "太极拳", "力量训练"],
+                likeCount: 178
+            }
+        };
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载文章内容
+            loadArticle();
+            
+            // 绑定事件
+            bindEvents();
+            
+            // 从本地存储加载用户数据
+            loadUserData();
+        });
+        
+        // 加载文章内容
+        function loadArticle() {
+            // 获取URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');
+            
+            // 如果没有指定文章ID，默认显示第一篇文章
+            const article = articles[articleId] || articles[1];
+            
+            // 更新页面标题
+            document.title = `${article.title} - 医疗健康助手`;
+            
+            // 更新文章内容
+            document.querySelector('h1').textContent = article.title;
+            document.querySelector('.flex.items-center.mb-6 .font-medium').textContent = article.author;
+            document.querySelector('.flex.items-center.mb-6 .text-sm.text-gray-500').innerHTML = `
+                <span>${article.authorTitle}</span>
+                <span class="mx-2">·</span>
+                <span>${article.date}</span>
+                <span class="mx-2">·</span>
+                <span>${article.readTime}</span>
+            `;
+            document.querySelector('.bg-blue-50 .text-gray-700').textContent = article.summary;
+            document.querySelector('.article-content').innerHTML = article.content;
+            
+            // 更新文章标签
+            const tagsContainer = document.querySelector('.mt-8.flex.flex-wrap.gap-2');
+            tagsContainer.innerHTML = '';
+            article.tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm rounded-full';
+                tagElement.textContent = tag;
+                tagsContainer.appendChild(tagElement);
+            });
+            
+            // 更新点赞数
+            document.getElementById('likeCount').textContent = article.likeCount;
+        }
+        
+        // 绑定事件
+        function bindEvents() {
+            // 返回按钮点击事件
+            document.getElementById('backButton').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 主题切换按钮点击事件
+            document.getElementById('themeToggle').addEventListener('click', function() {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('darkMode', 'disabled');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('darkMode', 'enabled');
+                }
+            });
+            
+            // 点赞按钮点击事件
+            document.getElementById('likeButton').addEventListener('click', function() {
+                toggleLike();
+            });
+            
+            // 收藏按钮点击事件
+            document.getElementById('bookmarkButton').addEventListener('click', function() {
+                toggleBookmark();
+            });
+            
+            // 分享按钮点击事件
+            document.querySelectorAll('.share-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    shareArticle(this);
+                });
+            });
+            
+            // 提交评论按钮点击事件
+            document.getElementById('submitComment').addEventListener('click', function() {
+                submitComment();
+            });
+            
+            // 加载更多评论按钮点击事件
+            document.getElementById('loadMoreComments').addEventListener('click', function() {
+                loadMoreComments();
+            });
+            
+            // 评论输入框回车事件
+            document.getElementById('commentInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    submitComment();
+                }
+            });
+        }
+        
+        // 从本地存储加载用户数据
+        function loadUserData() {
+            // 检查深色模式设置
+            if (localStorage.getItem('darkMode') === 'enabled' || 
+                (localStorage.getItem('darkMode') !== 'disabled' && 
+                 window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+            
+            // 检查点赞状态
+            if (localStorage.getItem('articleLiked') === 'true') {
+                document.getElementById('likeButton').classList.add('active');
+                document.getElementById('likeButton').innerHTML = '<i class="fa fa-heart text-xl mr-2"></i><span id="likeCount">246</span><span class="ml-1">已点赞</span>';
+            }
+            
+            // 检查收藏状态
+            if (localStorage.getItem('articleBookmarked') === 'true') {
+                document.getElementById('bookmarkButton').innerHTML = '<i class="fa fa-bookmark text-xl mr-2"></i><span>已收藏</span>';
+            }
+        }
+        
+        // 切换点赞状态
+        function toggleLike() {
+            const likeButton = document.getElementById('likeButton');
+            const likeCountElement = document.getElementById('likeCount');
+            let likeCount = parseInt(likeCountElement.textContent);
+            
+            if (likeButton.classList.contains('active')) {
+                // 取消点赞
+                likeButton.classList.remove('active');
+                likeCount--;
+                likeCountElement.textContent = likeCount;
+                likeButton.innerHTML = '<i class="fa fa-heart-o text-xl mr-2"></i><span id="likeCount">' + likeCount + '</span><span class="ml-1">点赞</span>';
+                localStorage.setItem('articleLiked', 'false');
+                showToast('已取消点赞');
+            } else {
+                // 点赞
+                likeButton.classList.add('active');
+                likeCount++;
+                likeCountElement.textContent = likeCount;
+                likeButton.innerHTML = '<i class="fa fa-heart text-xl mr-2"></i><span id="likeCount">' + likeCount + '</span><span class="ml-1">已点赞</span>';
+                localStorage.setItem('articleLiked', 'true');
+                showToast('点赞成功');
+            }
+        }
+        
+        // 切换收藏状态
+        function toggleBookmark() {
+            const bookmarkButton = document.getElementById('bookmarkButton');
+            
+            if (bookmarkButton.innerHTML.includes('已收藏')) {
+                // 取消收藏
+                bookmarkButton.innerHTML = '<i class="fa fa-bookmark-o text-xl mr-2"></i><span>收藏</span>';
+                localStorage.setItem('articleBookmarked', 'false');
+                showToast('已取消收藏');
+            } else {
+                // 收藏
+                bookmarkButton.innerHTML = '<i class="fa fa-bookmark text-xl mr-2"></i><span>已收藏</span>';
+                localStorage.setItem('articleBookmarked', 'true');
+                showToast('收藏成功');
+            }
+        }
+        
+        // 分享文章
+        function shareArticle(button) {
+            const platform = button.querySelector('i').className;
+            let message = '';
+            
+            if (platform.includes('weixin')) {
+                message = '微信分享成功';
+            } else if (platform.includes('weibo')) {
+                message = '微博分享成功';
+            } else if (platform.includes('qq')) {
+                message = 'QQ分享成功';
+            } else if (platform.includes('link')) {
+                // 复制链接
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    message = '链接已复制到剪贴板';
+                    showToast(message);
+                });
+                return;
+            }
+            
+            showToast(message);
+        }
+        
+        // 提交评论
+        function submitComment() {
+            const commentInput = document.getElementById('commentInput');
+            const commentText = commentInput.value.trim();
+            
+            if (!commentText) {
+                showToast('请输入评论内容');
+                return;
+            }
+            
+            // 创建新评论
+            const commentList = document.getElementById('commentList');
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-card p-4 border-b border-gray-200 dark:border-gray-700';
+            
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}`;
+            
+            newComment.innerHTML = `
+                <div class="flex items-start">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                        <i class="fa fa-user text-primary dark:text-secondary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="font-medium">我</span>
+                                <span class="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full">刚刚</span>
+                            </div>
+                            <button class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                <i class="fa fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                        <p class="mt-2 text-gray-700 dark:text-gray-300">
+                            ${commentText}
+                        </p>
+                        <div class="flex items-center mt-3">
+                            <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary mr-4">
+                                <i class="fa fa-thumbs-o-up mr-1"></i>
+                                <span>0</span>
+                            </button>
+                            <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                <i class="fa fa-comment-o mr-1"></i>
+                                <span>回复</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 将新评论添加到评论列表的顶部
+            commentList.insertBefore(newComment, commentList.firstChild);
+            
+            // 清空评论输入框
+            commentInput.value = '';
+            
+            // 显示提示
+            showToast('评论发表成功');
+            
+            // 添加动画效果
+            newComment.style.opacity = '0';
+            newComment.style.transform = 'translateY(-20px)';
+            newComment.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                newComment.style.opacity = '1';
+                newComment.style.transform = 'translateY(0)';
+            }, 10);
+        }
+        
+        // 加载更多评论
+        function loadMoreComments() {
+            const loadMoreButton = document.getElementById('loadMoreComments');
+            loadMoreButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>加载中...';
+            loadMoreButton.disabled = true;
+            
+            // 模拟加载延迟
+            setTimeout(() => {
+                // 创建新评论
+                const commentList = document.getElementById('commentList');
+                
+                for (let i = 0; i < 2; i++) {
+                    const newComment = document.createElement('div');
+                    newComment.className = 'comment-card p-4 border-b border-gray-200 dark:border-gray-700';
+                    
+                    const randomUser = ['运动达人', '健康饮食', '养生爱好者', '医学学生', '健身教练'][Math.floor(Math.random() * 5)];
+                    const randomDays = Math.floor(Math.random() * 10) + 1;
+                    const randomLikes = Math.floor(Math.random() * 50);
+                    
+                    newComment.innerHTML = `
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-${['blue', 'green', 'purple', 'yellow', 'red'][Math.floor(Math.random() * 5)]}-100 dark:bg-${['blue', 'green', 'purple', 'yellow', 'red'][Math.floor(Math.random() * 5)]}-900/30 flex items-center justify-center mr-3">
+                                <i class="fa fa-user text-${['blue', 'green', 'purple', 'yellow', 'red'][Math.floor(Math.random() * 5)]}-600 dark:text-${['blue', 'green', 'purple', 'yellow', 'red'][Math.floor(Math.random() * 5)]}-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="font-medium">${randomUser}</span>
+                                        <span class="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full">${randomDays}天前</span>
+                                    </div>
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                                <p class="mt-2 text-gray-700 dark:text-gray-300">
+                                    这篇文章内容非常丰富，学到了很多关于体重管理的知识。我觉得科学的方法真的很重要，以前尝试过节食减肥，但效果都不理想，而且对身体也不好。现在明白了，健康的体重管理需要饮食、运动和心理的综合管理。
+                                </p>
+                                <div class="flex items-center mt-3">
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary mr-4">
+                                        <i class="fa fa-thumbs-o-up mr-1"></i>
+                                        <span>${randomLikes}</span>
+                                    </button>
+                                    <button class="flex items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                                        <i class="fa fa-comment-o mr-1"></i>
+                                        <span>回复</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 将新评论添加到评论列表
+                    commentList.appendChild(newComment);
+                }
+                
+                // 恢复按钮状态
+                loadMoreButton.innerHTML = '加载更多评论';
+                loadMoreButton.disabled = false;
+                
+                // 显示提示
+                showToast('已加载更多评论');
+            }, 1500);
+        }
+        
+        // 显示Toast提示
+        function showToast(message) {
+            // 创建Toast元素
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 opacity-0 transition-opacity duration-300';
+                document.body.appendChild(toast);
+            }
+            
+            // 设置提示内容
+            toast.textContent = message;
+            
+            // 显示Toast
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            
+            // 3秒后隐藏Toast
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

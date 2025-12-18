@@ -1,0 +1,1868 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>医疗健康应用</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <!-- 统一的 Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E88E5',
+            secondary: '#64B5F6',
+            accent: '#0D47A1',
+            light: '#E3F2FD',
+            dark: '#0D47A1'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .dark .glass-effect {
+        background: rgba(17, 24, 39, 0.7);
+      }
+      .card-shadow {
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      }
+      .dark .card-shadow {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .dark .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .transition-all-300 {
+        transition: all 0.3s ease;
+      }
+    }
+  </style>
+  <style>
+    /* 深色模式样式 */
+    .dark {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark body {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark .bg-white {
+      background-color: #1f2937;
+    }
+    
+    .dark .bg-gray-50 {
+      background-color: #111827;
+    }
+    
+    .dark .bg-gray-100 {
+      background-color: #374151;
+    }
+    
+    .dark .bg-gray-200 {
+      background-color: #4b5563;
+    }
+    
+    .dark .bg-gray-500 {
+      background-color: #6b7280;
+    }
+    
+    .dark .bg-blue-50 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-blue-100 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-green-50 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-green-100 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-red-50 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-red-100 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-yellow-50 {
+      background-color: #92400e;
+    }
+    
+    .dark .bg-yellow-100 {
+      background-color: #92400e;
+    }
+    
+    .dark .bg-purple-50 {
+      background-color: #5b21b6;
+    }
+    
+    .dark .bg-purple-100 {
+      background-color: #5b21b6;
+    }
+    
+    .dark .text-gray-400 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f3f4f6;
+    }
+    
+    .dark .text-gray-800 {
+      color: #f9fafb;
+    }
+    
+    .dark .border-gray-200 {
+      border-color: #374151;
+    }
+    
+    .dark .border-gray-300 {
+      border-color: #4b5563;
+    }
+    
+    .dark .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 深色模式下的模态框 */
+    .dark #modal .bg-white {
+      background-color: #1f2937;
+    }
+    
+    /* 深色模式下的语音输入提示 */
+    .dark #voiceInputPrompt .bg-white {
+      background-color: #1f2937;
+    }
+    
+    /* 深色模式下的Toast提示 */
+    .dark #toast {
+      background-color: #374151;
+    }
+    
+    /* 健康提示滚动动画 */
+    @keyframes scrollHealthTips {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(-100%);
+      }
+    }
+    
+    .health-tips-slider {
+      animation: scrollHealthTips 30s linear infinite;
+    }
+    
+    .health-tips-container:hover .health-tips-slider {
+      animation-play-state: paused;
+    }
+    
+    /* 深色模式切换动画 */
+    .dark-transition {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+  <!-- 背景图 -->
+  <div class="fixed inset-0 z-0">
+    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/b767183b860144558006c8b4791dbb63~tplv-a9rns2rl98-image.image?rcl=20251128003627B2B794879B6EBB7CC4EA&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1766853423&amp;x-signature=nl2tade1JahgRXEnO%2B4Rc1e96KE%3D" alt="背景" class="w-full h-full object-cover opacity-20">
+  </div>
+
+  <!-- 主容器 -->
+  <div class="relative z-10 min-h-screen flex flex-col max-w-md mx-auto bg-white shadow-lg overflow-hidden">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+      <!-- 用户头像 -->
+      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white cursor-pointer" id="userAvatar">
+        <i class="fa fa-user text-xl"></i>
+      </div>
+      
+      <!-- 右侧图标组 -->
+      <div class="flex items-center space-x-4">
+        <!-- 消息图标 -->
+        <div class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer relative" id="messageIcon">
+          <i class="fa fa-bell-o text-gray-600 text-xl"></i>
+          <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+        </div>
+        
+        <!-- 设置图标 -->
+        <div class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer" id="settingsIcon">
+          <i class="fa fa-cog text-gray-600 text-xl"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-1 p-4">
+      <!-- 欢迎消息 -->
+      <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800" id="greetingMessage">晚上好，用户</h1>
+      </div>
+
+      <!-- 症状描述输入框 -->
+      <div class="relative mb-8">
+        <input type="text" placeholder="描述症状，开始分诊" class="w-full py-3 px-4 pr-16 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm" id="symptomInput">
+        <button class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center text-gray-500" id="voiceInputBtn">
+          <i class="fa fa-microphone text-xl"></i>
+        </button>
+        <button class="absolute right-14 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center text-gray-500">
+          <i class="fa fa-search text-xl"></i>
+        </button>
+      </div>
+
+      <!-- 功能模块区域 -->
+      <div class="grid grid-cols-2 gap-4 mb-8">
+        <!-- 医院引导模块 -->
+        <div class="bg-white rounded-xl p-4 shadow-md flex flex-col items-center cursor-pointer hover:shadow-lg transition-all-300" id="hospitalGuideModule">
+          <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-3">
+            <i class="fa fa-hospital-o text-primary text-2xl"></i>
+          </div>
+          <span class="text-gray-700 font-medium">医院引导</span>
+        </div>
+        
+        <!-- 健康资讯模块 -->
+        <div class="bg-white rounded-xl p-4 shadow-md flex flex-col items-center cursor-pointer hover:shadow-lg transition-all-300" id="healthInfoModule">
+          <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-3">
+            <i class="fa fa-newspaper-o text-green-600 text-2xl"></i>
+          </div>
+          <span class="text-gray-700 font-medium">健康资讯</span>
+        </div>
+        
+        <!-- 备忘提醒模块 -->
+        <div class="bg-white rounded-xl p-4 shadow-md flex flex-col items-center cursor-pointer hover:shadow-lg transition-all-300" id="reminderModule">
+          <div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mb-3">
+            <i class="fa fa-bell text-yellow-600 text-2xl"></i>
+          </div>
+          <span class="text-gray-700 font-medium">备忘提醒</span>
+        </div>
+        
+        <!-- 便民服务模块 -->
+        <div class="bg-white rounded-xl p-4 shadow-md flex flex-col items-center cursor-pointer hover:shadow-lg transition-all-300" id="convenienceServiceModule">
+          <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-3">
+            <i class="fa fa-life-ring text-purple-600 text-2xl"></i>
+          </div>
+          <span class="text-gray-700 font-medium">便民服务</span>
+        </div>
+      </div>
+
+      <!-- 健康提示区域 -->
+      <div class="bg-blue-50 rounded-xl p-4 mb-8 relative overflow-hidden">
+        <div class="flex items-start">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-1">
+            <i class="fa fa-lightbulb-o text-primary"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-medium text-gray-800 mb-1">今日健康提示</h3>
+            <div class="health-tips-container h-8 overflow-hidden">
+              <div class="health-tips-slider">
+                <p class="text-gray-600 text-sm mb-4">保持每天8杯水的摄入量，有助于新陈代谢和身体机能正常运作。</p>
+                <p class="text-gray-600 text-sm mb-4">每天坚持30分钟有氧运动，可以有效提高心肺功能和增强免疫力。</p>
+                <p class="text-gray-600 text-sm mb-4">合理饮食，多吃蔬菜水果，减少高油高盐食物摄入，保持营养均衡。</p>
+                <p class="text-gray-600 text-sm mb-4">保持良好睡眠习惯，每晚7-8小时高质量睡眠对健康至关重要。</p>
+                <p class="text-gray-600 text-sm mb-4">定期体检，早发现早治疗，预防疾病发生。</p>
+                <p class="text-gray-600 text-sm mb-4">减轻压力，保持心情愉悦，有助于身心健康。</p>
+                <p class="text-gray-600 text-sm mb-4">勤洗手，保持良好个人卫生习惯，预防传染病。</p>
+                <p class="text-gray-600 text-sm mb-4">避免长时间久坐，每隔一小时起身活动5-10分钟。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </main>
+
+    <!-- 底部导航栏 -->
+    <nav class="bg-white shadow-lg rounded-t-3xl mx-2 mb-2 p-2">
+      <div class="flex justify-around">
+        <button class="flex flex-col items-center p-2 flex-1 text-primary" onclick="window.location.href='index.html'">
+          <i class="fa fa-home text-xl"></i>
+          <span class="text-xs mt-1">首页</span>
+        </button>
+        <button class="flex flex-col items-center p-2 flex-1 text-gray-500" onclick="window.location.href='record.html'">
+          <i class="fa fa-file-text-o text-xl"></i>
+          <span class="text-xs mt-1">记录</span>
+        </button>
+        <button class="flex flex-col items-center p-2 flex-1 text-gray-500" onclick="window.location.href='profile.html'">
+          <i class="fa fa-user-o text-xl"></i>
+          <span class="text-xs mt-1">我的</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- 模态框 -->
+  <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black opacity-50" id="modalOverlay"></div>
+    <div class="relative bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+      <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+        <i class="fa fa-times text-xl"></i>
+      </button>
+      <div id="modalContent" class="text-center">
+        <!-- 模态框内容将通过JavaScript动态插入 -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- 设置菜单模态框 -->
+  <div id="settingsMenu" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black opacity-50" id="settingsMenuOverlay"></div>
+    <div class="relative bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold text-gray-800">设置</h3>
+        <button id="closeSettingsMenu" class="text-gray-500 hover:text-gray-700">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-3 bg-light rounded-lg cursor-pointer" onclick="window.location.href='privacy.html'">
+          <div class="flex items-center">
+            <i class="fa fa-shield text-primary mr-3"></i>
+            <span class="text-gray-700">隐私设置</span>
+          </div>
+          <i class="fa fa-chevron-right text-gray-400"></i>
+        </div>
+        
+        <div class="flex items-center justify-between p-3 bg-light rounded-lg cursor-pointer" onclick="window.location.href='about.html'">
+          <div class="flex items-center">
+            <i class="fa fa-info-circle text-primary mr-3"></i>
+            <span class="text-gray-700">关于我们</span>
+          </div>
+          <i class="fa fa-chevron-right text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 语音输入提示 -->
+  <div id="voiceInputPrompt" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div class="relative bg-white rounded-xl p-6 max-w-md w-full mx-4 text-center">
+      <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+        <i class="fa fa-microphone text-primary text-3xl"></i>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800 mb-2">正在聆听...</h3>
+      <p class="text-gray-600 mb-4">请说出您的症状</p>
+      <div class="flex justify-center space-x-4">
+        <button id="cancelVoiceInput" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-full">取消</button>
+        <button id="confirmVoiceInput" class="px-6 py-2 bg-primary text-white rounded-full">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast提示 -->
+  <div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 opacity-0 transition-opacity duration-300">
+    提示内容
+  </div>
+
+  <script>
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 更新问候语
+      updateGreeting();
+      
+      // 初始化事件监听
+      initEventListeners();
+      
+      // 从本地存储加载用户数据
+      loadUserData();
+      
+      // 初始化健康提示滚动
+      initHealthTipsScroll();
+    });
+
+    // 更新问候语
+    function updateGreeting() {
+      const now = new Date();
+      const hour = now.getHours();
+      const greetingElement = document.getElementById('greetingMessage');
+      const userName = localStorage.getItem('userName') || '用户';
+      
+      let greeting = '';
+      if (hour >= 5 && hour < 12) {
+        greeting = '早上好';
+      } else if (hour >= 12 && hour < 18) {
+        greeting = '下午好';
+      } else {
+        greeting = '晚上好';
+      }
+      
+      greetingElement.textContent = `${greeting}，${userName}`;
+    }
+
+
+
+    // 初始化健康提示滚动
+    function initHealthTipsScroll() {
+      const tipsSlider = document.querySelector('.health-tips-slider');
+      if (tipsSlider) {
+        // 复制一份内容用于无缝滚动
+        const tipsContent = tipsSlider.innerHTML;
+        tipsSlider.innerHTML += tipsContent;
+        
+        // 调整动画持续时间以适应内容长度
+        const tipCount = tipsSlider.querySelectorAll('p').length / 2; // 除以2是因为我们复制了一份内容
+        const animationDuration = tipCount * 4; // 每条提示显示4秒
+        
+        // 更新动画持续时间
+        tipsSlider.style.animationDuration = `${animationDuration}s`;
+      }
+    }
+    
+    // 初始化事件监听
+    function initEventListeners() {
+      // 用户头像点击事件
+      document.getElementById('userAvatar').addEventListener('click', function() {
+        showUserProfile();
+      });
+      
+      // 消息图标点击事件
+      document.getElementById('messageIcon').addEventListener('click', function() {
+        showNotifications();
+      });
+      
+      // 设置图标点击事件
+      document.getElementById('settingsIcon').addEventListener('click', function() {
+        showSettings();
+      });
+      
+      // 医院引导模块点击事件
+      document.getElementById('hospitalGuideModule').addEventListener('click', function() {
+        window.location.href = 'department-navigation.html';
+      });
+      
+      // 健康资讯模块点击事件
+      document.getElementById('healthInfoModule').addEventListener('click', function() {
+        showHealthInfo();
+      });
+      
+      // 备忘提醒模块点击事件
+      document.getElementById('reminderModule').addEventListener('click', function() {
+        showReminder();
+      });
+      
+      // 便民服务模块点击事件
+      document.getElementById('convenienceServiceModule').addEventListener('click', function() {
+        showConvenienceService();
+      });
+      
+      // 语音输入按钮点击事件
+      document.getElementById('voiceInputBtn').addEventListener('click', function() {
+        startVoiceInput();
+      });
+      
+      // 取消语音输入按钮点击事件
+      document.getElementById('cancelVoiceInput').addEventListener('click', function() {
+        cancelVoiceInput();
+      });
+      
+      // 确认语音输入按钮点击事件
+      document.getElementById('confirmVoiceInput').addEventListener('click', function() {
+        confirmVoiceInput();
+      });
+      
+      // 症状输入框回车事件
+      document.getElementById('symptomInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchSymptom();
+        }
+      });
+      
+      // 关闭模态框按钮点击事件
+      document.getElementById('closeModal').addEventListener('click', function() {
+        closeModal();
+      });
+      
+      // 模态框背景点击事件
+      document.getElementById('modalOverlay').addEventListener('click', function() {
+        closeModal();
+      });
+      
+      // 设置菜单相关事件
+      document.getElementById('closeSettingsMenu').addEventListener('click', function() {
+        closeSettingsMenu();
+      });
+      
+      document.getElementById('settingsMenuOverlay').addEventListener('click', function() {
+        closeSettingsMenu();
+      });
+      
+      // 添加全局朗诵功能开关事件
+      const readAloudToggle = document.getElementById('readAloudToggle');
+      if (readAloudToggle) {
+        // 从本地存储加载状态
+        const isReadAloudEnabled = localStorage.getItem('readAloudEnabled') === 'true';
+        readAloudToggle.checked = isReadAloudEnabled;
+        
+        // 如果已启用，则添加朗诵按钮
+        if (isReadAloudEnabled) {
+          addReadAloudButton();
+        }
+        
+        readAloudToggle.addEventListener('change', function() {
+          if (this.checked) {
+            enableReadAloud();
+          } else {
+            disableReadAloud();
+          }
+        });
+      }
+      
+      // 添加深色模式开关事件（在设置模态框显示后绑定）
+    }
+
+    // 从本地存储加载用户数据
+    function loadUserData() {
+      const userAvatar = localStorage.getItem('userAvatar');
+      const userName = localStorage.getItem('userName');
+      
+      if (userAvatar) {
+        const avatarElement = document.getElementById('userAvatar');
+        avatarElement.innerHTML = `<img src="${userAvatar}" alt="用户头像" class="w-full h-full object-cover rounded-full">`;
+      }
+      
+      // 应用深色模式
+      const isDarkModeEnabled = localStorage.getItem('darkModeEnabled') === 'true';
+      if (isDarkModeEnabled) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+
+    // 显示设置菜单
+    function showSettingsMenu() {
+      document.getElementById('settingsMenu').classList.remove('hidden');
+    }
+    
+    // 关闭设置菜单
+    function closeSettingsMenu() {
+      document.getElementById('settingsMenu').classList.add('hidden');
+    }
+    
+    // 显示用户资料
+    function showUserProfile() {
+      const userName = localStorage.getItem('userName') || '用户';
+      const userAvatar = localStorage.getItem('userAvatar') || '';
+      
+      let content = `
+        <div class="flex flex-col items-center">
+          <div class="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white mb-4 overflow-hidden">
+            ${userAvatar ? `<img src="${userAvatar}" alt="用户头像" class="w-full h-full object-cover">` : '<i class="fa fa-user text-4xl"></i>'}
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-1">${userName}</h3>
+          <p class="text-gray-600 mb-6">查看个人资料</p>
+          
+          <button class="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-accent transition-all-300" onclick="window.location.href='profile.html'">
+            查看个人资料
+          </button>
+        </div>
+      `;
+      
+      showModal(content);
+    }
+
+    // 显示通知
+    function showNotifications() {
+      let content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">通知</h3>
+          
+          <div class="space-y-4">
+            <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                <i class="fa fa-bell-o text-primary"></i>
+              </div>
+              <div class="text-left">
+                <p class="font-medium text-gray-800">体检提醒</p>
+                <p class="text-sm text-gray-600">您的年度体检预约将在3天后到期</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start p-3 bg-green-50 rounded-lg">
+              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <i class="fa fa-check text-green-600"></i>
+              </div>
+              <div class="text-left">
+                <p class="font-medium text-gray-800">药品已送达</p>
+                <p class="text-sm text-gray-600">您订购的药品已送达，请查收</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
+              <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                <i class="fa fa-exclamation text-yellow-600"></i>
+              </div>
+              <div class="text-left">
+                <p class="font-medium text-gray-800">健康提醒</p>
+                <p class="text-sm text-gray-600">您有一项健康指标异常，请查看详情</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+    }
+
+    // 显示设置
+    function showSettings() {
+      // 从本地存储加载设置
+      const isReadAloudEnabled = localStorage.getItem('readAloudEnabled') === 'true';
+      const isDarkModeEnabled = localStorage.getItem('darkModeEnabled') === 'true';
+      
+      let content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">设置</h3>
+          
+          <div class="space-y-6">
+            <!-- 全局朗诵功能 -->
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                  <i class="fa fa-volume-up text-primary"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">全局朗诵功能</p>
+                  <p class="text-sm text-gray-600">朗读页面内容</p>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="readAloudToggle" class="sr-only peer" ${isReadAloudEnabled ? 'checked' : ''}>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            
+            <!-- 深色模式 -->
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                  <i class="fa fa-moon-o text-gray-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">深色模式</p>
+                  <p class="text-sm text-gray-600">切换应用主题</p>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="darkModeToggle" class="sr-only peer" ${isDarkModeEnabled ? 'checked' : ''}>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            
+            <!-- 隐私设置 -->
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer" onclick="window.location.href='privacy.html'">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                  <i class="fa fa-lock text-gray-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">隐私设置</p>
+                  <p class="text-sm text-gray-600">管理数据和隐私</p>
+                </div>
+              </div>
+              <i class="fa fa-chevron-right text-primary"></i>
+            </div>
+            
+            <!-- 关于我们 -->
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                  <i class="fa fa-info text-gray-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">关于我们</p>
+                  <p class="text-sm text-gray-600">应用版本 1.0.0</p>
+                </div>
+              </div>
+              <button class="text-primary">
+                <i class="fa fa-chevron-right"></i>
+              </button>
+            </div>
+            
+            <!-- 退出登录 -->
+            <button class="w-full py-3 mt-6 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all-300">
+              退出登录
+            </button>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+      
+      // 添加全局朗诵功能开关事件
+      const readAloudToggle = document.getElementById('readAloudToggle');
+      if (readAloudToggle) {
+        readAloudToggle.addEventListener('change', function() {
+          if (this.checked) {
+            enableReadAloud();
+          } else {
+            disableReadAloud();
+          }
+        });
+      }
+      
+      // 添加深色模式开关事件
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', function() {
+          if (this.checked) {
+            enableDarkMode();
+          } else {
+            disableDarkMode();
+          }
+        });
+      }
+    }
+    
+    // 医院引导功能
+    function showHospitalGuide() {
+      const content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">医院引导</h3>
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer" onclick="window.location.href='hospital-map.html'">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                  <i class="fa fa-map-marker text-primary"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">附近医院</p>
+                  <p class="text-sm text-gray-600">查找离您最近的医院</p>
+                </div>
+              </div>
+              <i class="fa fa-chevron-right text-primary"></i>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                  <i class="fa fa-stethoscope text-green-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">科室导航</p>
+                  <p class="text-sm text-gray-600">医院科室分布与导航</p>
+                </div>
+              </div>
+              <button class="text-primary">
+                <i class="fa fa-chevron-right"></i>
+              </button>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                  <i class="fa fa-calendar text-yellow-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">预约挂号</p>
+                  <p class="text-sm text-gray-600">在线预约医院挂号</p>
+                </div>
+              </div>
+              <button class="text-primary">
+                <i class="fa fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+      
+      // 添加按钮点击事件
+      const buttons = document.querySelectorAll('.bg-gray-50 button');
+      buttons.forEach(button => {
+        button.addEventListener('click', function() {
+          const itemText = this.closest('.bg-gray-50').querySelector('p.font-medium').textContent;
+          showToast(`${itemText}功能即将上线`);
+        });
+      });
+    }
+    
+    // 健康资讯功能
+    function showHealthInfo() {
+      const content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">健康资讯</h3>
+          
+          <div class="space-y-4">
+            <div class="p-3 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100 transition-all-300" onclick="window.location.href='article-detail.html?id=1'">
+              <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">健康科普</span>
+              <h4 class="font-medium text-gray-800 mt-1">冬季流感预防指南</h4>
+              <p class="text-sm text-gray-600 mt-1">了解如何在冬季有效预防流感，保护自己和家人的健康。</p>
+              <p class="text-xs text-gray-500 mt-2">2025-11-20</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100 transition-all-300" onclick="window.location.href='article-detail.html?id=2'">
+              <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">营养饮食</span>
+              <h4 class="font-medium text-gray-800 mt-1">健康饮食的五大原则</h4>
+              <p class="text-sm text-gray-600 mt-1">均衡饮食是维持健康的基础，本文介绍健康饮食的五大原则。</p>
+              <p class="text-xs text-gray-500 mt-2">2025-11-18</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100 transition-all-300" onclick="window.location.href='article-detail.html?id=3'">
+              <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">运动健身</span>
+              <h4 class="font-medium text-gray-800 mt-1">适合中老年人的居家运动</h4>
+              <p class="text-sm text-gray-600 mt-1">不需要出门，在家也能进行的适合中老年人的运动方式。</p>
+              <p class="text-xs text-gray-500 mt-2">2025-11-15</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+    }
+    
+    // 备忘提醒功能
+    function showReminder() {
+      // 获取已保存的提醒
+      let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+      
+      // 生成提醒列表HTML
+      let remindersHTML = '';
+      if (reminders.length > 0) {
+        reminders.forEach((reminder, index) => {
+          const date = new Date(reminder.timestamp);
+          const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+          
+          remindersHTML += `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                  <i class="fa fa-bell text-yellow-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">${reminder.title}</p>
+                  <p class="text-xs text-gray-500">${formattedDate}</p>
+                </div>
+              </div>
+              <button class="text-red-500" onclick="deleteReminder(${index})">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          `;
+        });
+      } else {
+        remindersHTML = `
+          <div class="text-center py-6">
+            <i class="fa fa-calendar-o text-gray-300 text-4xl mb-2"></i>
+            <p class="text-gray-500">暂无提醒，点击下方按钮添加</p>
+          </div>
+        `;
+      }
+      
+      const content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">备忘提醒</h3>
+          
+          <div class="space-y-3 mb-4" id="remindersList">
+            ${remindersHTML}
+          </div>
+          
+          <button class="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-accent transition-all-300" id="addReminderBtn">
+            <i class="fa fa-plus mr-1"></i> 添加提醒
+          </button>
+        </div>
+      `;
+      
+      showModal(content);
+      
+      // 添加提醒按钮点击事件
+      document.getElementById('addReminderBtn').addEventListener('click', function() {
+        const reminderTitle = prompt('请输入提醒内容：');
+        if (reminderTitle && reminderTitle.trim()) {
+          const newReminder = {
+            title: reminderTitle.trim(),
+            timestamp: Date.now()
+          };
+          
+          // 保存提醒
+          reminders.push(newReminder);
+          localStorage.setItem('reminders', JSON.stringify(reminders));
+          
+          // 刷新提醒列表
+          showReminder();
+        }
+      });
+    }
+    
+    // 删除提醒
+    function deleteReminder(index) {
+      let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+      reminders.splice(index, 1);
+      localStorage.setItem('reminders', JSON.stringify(reminders));
+      
+      // 刷新提醒列表
+      showReminder();
+    }
+    
+    // 便民服务功能
+    function showConvenienceService() {
+      const content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">便民服务</h3>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 bg-gray-50 rounded-lg flex flex-col items-center cursor-pointer hover:bg-gray-100 transition-all-300" id="emergencyCallItem">
+              <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                <i class="fa fa-ambulance text-primary text-xl"></i>
+              </div>
+              <p class="text-sm font-medium text-gray-800">急救电话</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg flex flex-col items-center cursor-pointer hover:bg-gray-100 transition-all-300" id="pharmacySearchItem">
+              <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
+                <i class="fa fa-medkit text-green-600 text-xl"></i>
+              </div>
+              <p class="text-sm font-medium text-gray-800">药店查询</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg flex flex-col items-center">
+              <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
+                <i class="fa fa-thermometer-half text-yellow-600 text-xl"></i>
+              </div>
+              <p class="text-sm font-medium text-gray-800">体温记录</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg flex flex-col items-center">
+              <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                <i class="fa fa-file-text-o text-purple-600 text-xl"></i>
+              </div>
+              <p class="text-sm font-medium text-gray-800">健康档案</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+      
+      // 添加按钮点击事件
+      const serviceItems = document.querySelectorAll('.bg-gray-50');
+      serviceItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const itemText = this.querySelector('p').textContent;
+          
+          if (itemText === '急救电话') {
+            // 显示急救电话模块
+            showEmergencyCallModule();
+          } else if (itemText === '体温记录') {
+            const temperature = prompt('请输入当前体温（℃）：');
+            if (temperature && !isNaN(temperature)) {
+              // 保存体温记录
+              let temperatureRecords = JSON.parse(localStorage.getItem('temperatureRecords')) || [];
+              temperatureRecords.push({
+                value: parseFloat(temperature),
+                timestamp: Date.now()
+              });
+              localStorage.setItem('temperatureRecords', JSON.stringify(temperatureRecords));
+              
+              showToast('体温记录已保存');
+            }
+          } else if (itemText === '药店查询') {
+            // 显示药店查询模块
+            showPharmacySearchModule();
+          } else if (itemText === '健康档案') {
+            // 跳转到健康记录页面
+            window.location.href = 'record.html';
+          } else {
+            showToast(`${itemText}功能即将上线`);
+          }
+        });
+      });
+    }
+    
+    // 显示急救电话模块
+    function showEmergencyCallModule() {
+      // 从本地存储加载紧急联系人
+      let emergencyContacts = JSON.parse(localStorage.getItem('emergencyContacts')) || [
+        { name: '急救中心', phone: '120', isDefault: true },
+        { name: '警察', phone: '110', isDefault: true },
+        { name: '消防', phone: '119', isDefault: true }
+      ];
+      
+      // 生成紧急联系人列表HTML
+      let contactsHTML = '';
+      emergencyContacts.forEach((contact, index) => {
+        contactsHTML += `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-${contact.isDefault ? 'blue' : 'green'}-100 flex items-center justify-center mr-3">
+                <i class="fa fa-${contact.isDefault ? 'phone' : 'user'} text-${contact.isDefault ? 'blue' : 'green'}-600"></i>
+              </div>
+              <div class="text-left">
+                <p class="font-medium text-gray-800">${contact.name}</p>
+                <p class="text-sm text-gray-600">${contact.phone}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600" onclick="callEmergencyContact('${contact.phone}')">
+                <i class="fa fa-phone"></i>
+              </button>
+              ${!contact.isDefault ? `
+                <button class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600" onclick="deleteEmergencyContact(${index})">
+                  <i class="fa fa-trash"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      const content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">紧急联系</h3>
+          
+          <div class="space-y-3 mb-6">
+            ${contactsHTML}
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3 mb-6">
+            <button class="flex flex-col items-center p-3 bg-blue-50 rounded-lg" id="addContactBtn">
+              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                <i class="fa fa-plus text-primary"></i>
+              </div>
+              <p class="text-sm font-medium text-gray-800">添加联系人</p>
+            </button>
+            
+            <button class="flex flex-col items-center p-3 bg-yellow-50 rounded-lg" id="firstAidKnowledgeBtn">
+              <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
+                <i class="fa fa-book text-yellow-600"></i>
+              </div>
+              <p class="text-sm font-medium text-gray-800">急救知识</p>
+            </button>
+          </div>
+          
+          <div class="bg-red-50 rounded-lg p-4 text-left">
+            <h4 class="font-medium text-gray-800 mb-2">紧急情况提示</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• 保持冷静，清晰描述情况</li>
+              <li>• 提供准确的位置信息</li>
+              <li>• 等待专业人员的指导</li>
+              <li>• 在紧急情况下，优先拨打120</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+      
+      // 添加按钮点击事件
+      document.getElementById('addContactBtn').addEventListener('click', function() {
+        addEmergencyContact();
+      });
+      
+      document.getElementById('firstAidKnowledgeBtn').addEventListener('click', function() {
+        showFirstAidKnowledge();
+      });
+    }
+    
+    // 拨打紧急联系人电话
+    function callEmergencyContact(phoneNumber) {
+      showToast(`正在拨打 ${phoneNumber}...`);
+      
+      // 模拟拨打电话
+      setTimeout(() => {
+        alert(`模拟拨打紧急电话：${phoneNumber}`);
+      }, 1500);
+    }
+    
+    // 添加紧急联系人
+    function addEmergencyContact() {
+      const name = prompt('请输入联系人姓名：');
+      if (!name || name.trim() === '') {
+        showToast('请输入有效的联系人姓名');
+        return;
+      }
+      
+      const phone = prompt('请输入联系人电话：');
+      if (!phone || phone.trim() === '' || !/^\d{11}$/.test(phone.trim())) {
+        showToast('请输入有效的11位电话号码');
+        return;
+      }
+      
+      // 从本地存储加载紧急联系人
+      let emergencyContacts = JSON.parse(localStorage.getItem('emergencyContacts')) || [
+        { name: '急救中心', phone: '120', isDefault: true },
+        { name: '警察', phone: '110', isDefault: true },
+        { name: '消防', phone: '119', isDefault: true }
+      ];
+      
+      // 添加新联系人
+      emergencyContacts.push({
+        name: name.trim(),
+        phone: phone.trim(),
+        isDefault: false
+      });
+      
+      // 保存到本地存储
+      localStorage.setItem('emergencyContacts', JSON.stringify(emergencyContacts));
+      
+      // 刷新紧急联系人列表
+      showEmergencyCallModule();
+      
+      showToast('紧急联系人添加成功');
+    }
+    
+    // 删除紧急联系人
+    function deleteEmergencyContact(index) {
+      // 从本地存储加载紧急联系人
+      let emergencyContacts = JSON.parse(localStorage.getItem('emergencyContacts')) || [
+        { name: '急救中心', phone: '120', isDefault: true },
+        { name: '警察', phone: '110', isDefault: true },
+        { name: '消防', phone: '119', isDefault: true }
+      ];
+      
+      // 删除联系人
+      emergencyContacts.splice(index, 1);
+      
+      // 保存到本地存储
+      localStorage.setItem('emergencyContacts', JSON.stringify(emergencyContacts));
+      
+      // 刷新紧急联系人列表
+      showEmergencyCallModule();
+      
+      showToast('紧急联系人已删除');
+    }
+    
+    // 显示药店查询模块
+    function showPharmacySearchModule() {
+      // 从本地存储获取健康记录
+      let healthRecords = JSON.parse(localStorage.getItem('healthRecords')) || [];
+      
+      // 获取最新的分诊记录
+      let latestRecord = null;
+      if (healthRecords.length > 0) {
+        // 按时间排序，获取最新的记录
+        healthRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+        latestRecord = healthRecords[0];
+      }
+      
+      // 生成建议用药HTML
+      let medicationHTML = '';
+      if (latestRecord && latestRecord.medication && latestRecord.medication !== '暂无建议用药') {
+        const medications = latestRecord.medication.split('、');
+        medicationHTML = `
+          <div class="bg-blue-50 rounded-lg p-4 mb-6">
+            <h4 class="font-medium text-gray-800 mb-2">根据您的最新分诊结果，建议购买以下药品：</h4>
+            <div class="flex flex-wrap gap-2">
+              ${medications.map(med => `<span class="px-3 py-1 bg-light text-primary rounded-full text-sm">${med}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        medicationHTML = `
+          <div class="bg-yellow-50 rounded-lg p-4 mb-6">
+            <h4 class="font-medium text-gray-800 mb-2">暂无用药建议</h4>
+            <p class="text-sm text-gray-600">请先进行症状分诊，获取用药建议后再使用此功能。</p>
+          </div>
+        `;
+      }
+      
+      // 生成附近药店列表HTML
+      const pharmacies = [
+        { name: '康健大药房', distance: '0.5km', address: '健康路123号', phone: '13800138001', open: true },
+        { name: '惠民药店', distance: '0.8km', address: '和平路456号', phone: '13900139002', open: true },
+        { name: '仁心堂', distance: '1.2km', address: '和谐路789号', phone: '13700137003', open: false },
+        { name: '安心药房', distance: '1.5km', address: '平安路101号', phone: '13600136004', open: true }
+      ];
+      
+      let pharmaciesHTML = '';
+      pharmacies.forEach(pharmacy => {
+        pharmaciesHTML += `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-3">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <i class="fa fa-medkit text-green-600"></i>
+              </div>
+              <div class="text-left">
+                <div class="flex items-center">
+                  <p class="font-medium text-gray-800">${pharmacy.name}</p>
+                  ${pharmacy.open ? '<span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">营业中</span>' : '<span class="ml-2 text-xs bg-gray-100 text-gray-800 px-2 py-0.5 rounded">已关门</span>'}
+                </div>
+                <p class="text-xs text-gray-600">${pharmacy.distance} · ${pharmacy.address}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600" onclick="showPharmacyLocation('${pharmacy.name}', '${pharmacy.address}')">
+                <i class="fa fa-map-marker"></i>
+              </button>
+              <button class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600" onclick="callPharmacy('${pharmacy.phone}')">
+                <i class="fa fa-phone"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      const content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">药店查询</h3>
+          
+          ${medicationHTML}
+          
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="font-medium text-gray-800">附近药店</h4>
+              <button class="text-xs text-primary flex items-center" onclick="refreshPharmacies()">
+                <i class="fa fa-refresh mr-1"></i> 刷新
+              </button>
+            </div>
+            
+            <div class="space-y-3 max-h-[350px] overflow-y-auto">
+              ${pharmaciesHTML}
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-medium text-gray-800 mb-2">温馨提示</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• 请携带有效身份证件购买处方药</li>
+              <li>• 购买药品前请咨询药师意见</li>
+              <li>• 如症状持续或加重，请及时就医</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+    }
+    
+    // 显示药店位置
+    function showPharmacyLocation(name, address) {
+      showToast(`正在导航到 ${name}...`);
+      
+      // 模拟地图导航
+      setTimeout(() => {
+        alert(`模拟导航到：${name}\n地址：${address}`);
+      }, 1500);
+    }
+    
+    // 拨打药店电话
+    function callPharmacy(phoneNumber) {
+      showToast(`正在拨打 ${phoneNumber}...`);
+      
+      // 模拟拨打电话
+      setTimeout(() => {
+        alert(`模拟拨打药店电话：${phoneNumber}`);
+      }, 1500);
+    }
+    
+    // 刷新药店列表
+    function refreshPharmacies() {
+      showToast('正在刷新药店列表...');
+      
+      // 模拟刷新
+      setTimeout(() => {
+        showPharmacySearchModule();
+        showToast('药店列表已更新');
+      }, 1500);
+    }
+    
+    // 显示急救知识
+    function showFirstAidKnowledge() {
+      const content = `
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">急救知识</h3>
+          
+          <div class="space-y-4 max-h-[400px] overflow-y-auto">
+            <div class="p-3 bg-gray-50 rounded-lg text-left">
+              <h4 class="font-medium text-gray-800 mb-1">心肺复苏术(CPR)</h4>
+              <p class="text-sm text-gray-600">发现有人倒地无意识无呼吸，请立即拨打120并开始CPR：胸外按压30次，人工呼吸2次，重复进行。</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg text-left">
+              <h4 class="font-medium text-gray-800 mb-1">止血方法</h4>
+              <p class="text-sm text-gray-600">直接压迫止血：用干净纱布直接压迫伤口5-10分钟。抬高患肢：将受伤部位抬高至高于心脏水平。</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg text-left">
+              <h4 class="font-medium text-gray-800 mb-1">烧伤处理</h4>
+              <p class="text-sm text-gray-600">立即用流动冷水冲洗烧伤部位15-20分钟，不要使用冰块或冰水。不要随意涂抹药膏或油脂。</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg text-left">
+              <h4 class="font-medium text-gray-800 mb-1">异物卡喉</h4>
+              <p class="text-sm text-gray-600">成人：实施海姆立克急救法，腹部冲击。婴儿：拍打背部5次，胸部按压5次，重复进行。</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg text-left">
+              <h4 class="font-medium text-gray-800 mb-1">骨折固定</h4>
+              <p class="text-sm text-gray-600">不要试图复位骨折部位，用夹板或硬纸板固定骨折部位，保持肢体在受伤时的位置。</p>
+            </div>
+            
+            <div class="p-3 bg-gray-50 rounded-lg text-left">
+              <h4 class="font-medium text-gray-800 mb-1">中风识别</h4>
+              <p class="text-sm text-gray-600">记住FAST原则：Face(面部下垂)、Arm(手臂无力)、Speech(言语不清)、Time(立即就医)。</p>
+            </div>
+          </div>
+          
+          <div class="mt-6 text-sm text-gray-500">
+            <p>注：以上知识仅供参考，在紧急情况下请务必拨打急救电话并听从专业人员指导。</p>
+          </div>
+        </div>
+      `;
+      
+      showModal(content);
+    }
+
+    // 开始语音输入
+    function startVoiceInput() {
+      document.getElementById('voiceInputPrompt').classList.remove('hidden');
+      
+      // 模拟语音识别
+      setTimeout(function() {
+        document.getElementById('symptomInput').value = '头痛，发热，咳嗽';
+        document.getElementById('voiceInputPrompt').classList.add('hidden');
+        showToast('语音识别成功');
+      }, 3000);
+    }
+
+    // 取消语音输入
+    function cancelVoiceInput() {
+      document.getElementById('voiceInputPrompt').classList.add('hidden');
+    }
+
+    // 确认语音输入
+    function confirmVoiceInput() {
+      document.getElementById('voiceInputPrompt').classList.add('hidden');
+      showToast('语音识别成功');
+    }
+
+    // 搜索症状
+    function searchSymptom() {
+      const symptomInput = document.getElementById('symptomInput');
+      const symptom = symptomInput.value.trim();
+      
+      if (!symptom) {
+        showToast('请输入症状');
+        return;
+      }
+      
+      // 模拟症状搜索和分诊
+      showToast('正在分析症状...');
+      
+      setTimeout(function() {
+        // 根据症状关键词生成不同的分诊结果
+        let result = '';
+        
+        if (symptom.includes('头痛') || symptom.includes('头晕')) {
+          result = generateHeadacheResult(symptom);
+        } else if (symptom.includes('发热') || symptom.includes('发烧')) {
+          result = generateFeverResult(symptom);
+        } else if (symptom.includes('咳嗽') || symptom.includes('喉咙痛')) {
+          result = generateCoughResult(symptom);
+        } else if (symptom.includes('腹痛') || symptom.includes('腹泻')) {
+          result = generateStomachacheResult(symptom);
+        } else {
+          result = generateGeneralResult(symptom);
+        }
+        
+        showModal(result);
+        
+        // 保存到健康记录
+        saveHealthRecord(symptom, result);
+      }, 1500);
+    }
+
+    // 生成头痛分诊结果
+    function generateHeadacheResult(symptom) {
+      return `
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fa fa-stethoscope text-primary text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">分诊结果</h3>
+          <p class="text-gray-600 mb-4">您描述的症状：${symptom}</p>
+          
+          <div class="bg-blue-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">可能的原因</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>紧张性头痛</li>
+              <li>偏头痛</li>
+              <li>颈椎问题引起的头痛</li>
+              <li>眼部疲劳引起的头痛</li>
+            </ul>
+          </div>
+          
+          <div class="bg-green-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">建议</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>充分休息，避免长时间用眼</li>
+              <li>保持良好的坐姿和颈椎姿势</li>
+              <li>可服用布洛芬或对乙酰氨基酚缓解症状</li>
+              <li>如症状持续或加重，请及时就医</li>
+            </ul>
+          </div>
+          
+          <div class="flex justify-center space-x-4">
+            <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded-full">了解更多</button>
+            <button class="px-6 py-2 bg-primary text-white rounded-full">预约医生</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 生成发热分诊结果
+    function generateFeverResult(symptom) {
+      return `
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fa fa-thermometer-three-quarters text-red-500 text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">分诊结果</h3>
+          <p class="text-gray-600 mb-4">您描述的症状：${symptom}</p>
+          
+          <div class="bg-blue-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">可能的原因</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>上呼吸道感染</li>
+              <li>流感</li>
+              <li>其他感染性疾病</li>
+              <li>自身免疫性疾病</li>
+            </ul>
+          </div>
+          
+          <div class="bg-green-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">建议</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>多休息，多饮水</li>
+              <li>可服用对乙酰氨基酚或布洛芬降温</li>
+              <li>如体温超过38.5°C或持续发热超过3天，请及时就医</li>
+              <li>注意个人卫生，避免传染给家人</li>
+            </ul>
+          </div>
+          
+          <div class="flex justify-center space-x-4">
+            <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded-full">了解更多</button>
+            <button class="px-6 py-2 bg-primary text-white rounded-full">预约医生</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 生成咳嗽分诊结果
+    function generateCoughResult(symptom) {
+      return `
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fa fa-lungs text-yellow-600 text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">分诊结果</h3>
+          <p class="text-gray-600 mb-4">您描述的症状：${symptom}</p>
+          
+          <div class="bg-blue-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">可能的原因</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>上呼吸道感染</li>
+              <li>支气管炎</li>
+              <li>过敏性鼻炎</li>
+              <li>环境刺激引起的咳嗽</li>
+            </ul>
+          </div>
+          
+          <div class="bg-green-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">建议</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>保持室内空气湿润</li>
+              <li>多饮温水，避免刺激性食物</li>
+              <li>可服用止咳药或含片缓解症状</li>
+              <li>如咳嗽持续超过2周或伴有呼吸困难，请及时就医</li>
+            </ul>
+          </div>
+          
+          <div class="flex justify-center space-x-4">
+            <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded-full">了解更多</button>
+            <button class="px-6 py-2 bg-primary text-white rounded-full">预约医生</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 生成腹痛分诊结果
+    function generateStomachacheResult(symptom) {
+      return `
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fa fa-bowel text-green-600 text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">分诊结果</h3>
+          <p class="text-gray-600 mb-4">您描述的症状：${symptom}</p>
+          
+          <div class="bg-blue-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">可能的原因</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>消化不良</li>
+              <li>胃炎</li>
+              <li>肠炎</li>
+              <li>肠易激综合征</li>
+            </ul>
+          </div>
+          
+          <div class="bg-green-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">建议</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>饮食清淡，避免油腻刺激性食物</li>
+              <li>少食多餐，避免暴饮暴食</li>
+              <li>可服用抗酸药或止泻药缓解症状</li>
+              <li>如腹痛剧烈或持续超过24小时，请及时就医</li>
+            </ul>
+          </div>
+          
+          <div class="flex justify-center space-x-4">
+            <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded-full">了解更多</button>
+            <button class="px-6 py-2 bg-primary text-white rounded-full">预约医生</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 生成一般分诊结果
+    function generateGeneralResult(symptom) {
+      return `
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fa fa-medkit text-gray-600 text-3xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">分诊结果</h3>
+          <p class="text-gray-600 mb-4">您描述的症状：${symptom}</p>
+          
+          <div class="bg-blue-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">可能的原因</h4>
+            <p class="text-gray-600">根据您提供的症状，我们无法确定具体原因。症状可能与多种健康问题有关。</p>
+          </div>
+          
+          <div class="bg-green-50 rounded-lg p-4 mb-4 text-left">
+            <h4 class="font-bold text-gray-800 mb-2">建议</h4>
+            <ul class="list-disc list-inside text-gray-600 space-y-1">
+              <li>请提供更详细的症状描述</li>
+              <li>保持充分休息</li>
+              <li>如症状持续或加重，请及时就医</li>
+              <li>可尝试使用我们的AI问诊功能获取更精准的建议</li>
+            </ul>
+          </div>
+          
+          <div class="flex justify-center space-x-4">
+            <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded-full">了解更多</button>
+            <button class="px-6 py-2 bg-primary text-white rounded-full">预约医生</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 保存健康记录
+    function saveHealthRecord(symptom, result) {
+      // 从本地存储加载现有记录
+      let healthRecords = JSON.parse(localStorage.getItem('healthRecords')) || [];
+      
+      // 创建新记录
+      const newRecord = {
+        id: Date.now().toString(),
+        date: getCurrentDate(),
+        symptom: symptom,
+        result: result,
+        category: categorizeSymptom(symptom),
+        medication: suggestMedication(symptom),
+        timestamp: Date.now()
+      };
+      
+      // 添加新记录到数组
+      healthRecords.unshift(newRecord);
+      
+      // 保存回本地存储
+      localStorage.setItem('healthRecords', JSON.stringify(healthRecords));
+      
+      // 同时更新分诊结果
+      updateTriageResult(newRecord);
+    }
+    
+    // 获取当前日期
+    function getCurrentDate() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+    
+    // 更新分诊结果
+    function updateTriageResult(record) {
+      // 获取现有分诊结果
+      let triageResults = JSON.parse(localStorage.getItem('triageResults') || '[]');
+      
+      // 创建新的分诊结果
+      const newTriage = {
+        id: record.id,
+        date: record.date,
+        symptom: record.symptom,
+        category: record.category,
+        description: record.result,
+        medication: record.medication,
+        timestamp: record.timestamp,
+        severity: getSeverityLevel(record.symptom)
+      };
+      
+      // 添加新的分诊结果
+      triageResults.push(newTriage);
+      
+      // 保存回localStorage
+      localStorage.setItem('triageResults', JSON.stringify(triageResults));
+    }
+    
+    // 根据症状获取严重程度
+    function getSeverityLevel(symptom) {
+      // 简单的关键词匹配来确定严重程度
+      const highRiskKeywords = ['胸痛', '呼吸困难', '高烧', '头痛', '意识', '出血', '呕吐', '腹痛', '晕厥', '抽搐'];
+      const mediumRiskKeywords = ['咳嗽', '发热', '疲劳', '恶心', '腹泻', '头晕', '皮疹', '关节痛', '肌肉痛', '咽喉痛'];
+      
+      symptom = symptom.toLowerCase();
+      
+      for (const keyword of highRiskKeywords) {
+        if (symptom.includes(keyword.toLowerCase())) {
+          return '高风险';
+        }
+      }
+      
+      for (const keyword of mediumRiskKeywords) {
+        if (symptom.includes(keyword.toLowerCase())) {
+          return '中风险';
+        }
+      }
+      
+      return '低风险';
+    }
+
+    // 对症状进行分类
+    function categorizeSymptom(symptom) {
+      if (symptom.includes('头痛') || symptom.includes('头晕')) {
+        return '神经系统';
+      } else if (symptom.includes('发热') || symptom.includes('发烧')) {
+        return '全身症状';
+      } else if (symptom.includes('咳嗽') || symptom.includes('喉咙痛') || symptom.includes('呼吸')) {
+        return '呼吸系统';
+      } else if (symptom.includes('腹痛') || symptom.includes('腹泻') || symptom.includes('消化')) {
+        return '消化系统';
+      } else if (symptom.includes('皮肤')) {
+        return '皮肤问题';
+      } else {
+        return '其他症状';
+      }
+    }
+
+    // 建议用药
+    function suggestMedication(symptom) {
+      if (symptom.includes('头痛') || symptom.includes('头晕')) {
+        return '布洛芬、对乙酰氨基酚';
+      } else if (symptom.includes('发热') || symptom.includes('发烧')) {
+        return '对乙酰氨基酚、布洛芬';
+      } else if (symptom.includes('咳嗽') || symptom.includes('喉咙痛')) {
+        return '止咳糖浆、含片';
+      } else if (symptom.includes('腹痛') || symptom.includes('腹泻')) {
+        return '抗酸药、止泻药';
+      } else {
+        return '暂无建议用药';
+      }
+    }
+
+    // 显示模态框
+    function showModal(content) {
+      const modal = document.getElementById('modal');
+      const modalContent = document.getElementById('modalContent');
+      
+      modalContent.innerHTML = content;
+      modal.classList.remove('hidden');
+    }
+
+    // 关闭模态框
+    function closeModal() {
+      const modal = document.getElementById('modal');
+      modal.classList.add('hidden');
+    }
+
+    // 显示Toast提示
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      
+      setTimeout(function() {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 3000);
+    }
+
+    // 全局朗诵功能
+    function enableReadAloud() {
+      localStorage.setItem('readAloudEnabled', 'true');
+      addReadAloudButton();
+      showToast('已启用全局朗诵功能');
+    }
+
+    function disableReadAloud() {
+      localStorage.setItem('readAloudEnabled', 'false');
+      removeReadAloudButton();
+      window.speechSynthesis.cancel(); // 停止当前正在播放的语音
+      showToast('已禁用全局朗诵功能');
+    }
+    
+    // 启用深色模式
+    function enableDarkMode() {
+      localStorage.setItem('darkModeEnabled', 'true');
+      document.documentElement.classList.add('dark');
+      showToast('已启用深色模式');
+    }
+    
+    // 禁用深色模式
+    function disableDarkMode() {
+      localStorage.setItem('darkModeEnabled', 'false');
+      document.documentElement.classList.remove('dark');
+      showToast('已禁用深色模式');
+    }
+
+    // 添加全局朗诵按钮
+    function addReadAloudButton() {
+      // 检查按钮是否已存在
+      if (document.getElementById('readAloudBtn')) return;
+      
+      const readAloudBtn = document.createElement('button');
+      readAloudBtn.id = 'readAloudBtn';
+      readAloudBtn.className = 'fixed bottom-24 right-6 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg z-40';
+      readAloudBtn.innerHTML = '<i class="fa fa-volume-up text-xl"></i>';
+      readAloudBtn.title = '点击朗诵当前页面内容';
+      
+      // 添加点击事件
+      readAloudBtn.addEventListener('click', function() {
+        readPageContentAloud();
+      });
+      
+      document.body.appendChild(readAloudBtn);
+    }
+
+    // 移除全局朗诵按钮
+    function removeReadAloudButton() {
+      const readAloudBtn = document.getElementById('readAloudBtn');
+      if (readAloudBtn) {
+        document.body.removeChild(readAloudBtn);
+      }
+    }
+
+    // 朗诵页面内容
+    function readPageContentAloud() {
+      // 停止当前正在播放的语音
+      window.speechSynthesis.cancel();
+      
+      // 获取页面主要内容
+      const pageTitle = document.title;
+      const greeting = document.getElementById('greetingMessage')?.textContent || '';
+      const symptomPlaceholder = document.getElementById('symptomInput')?.placeholder || '';
+      
+      // 组合朗读内容
+      let content = `${pageTitle}。${greeting}。${symptomPlaceholder}。`;
+      
+      // 获取功能模块标题
+      const featureTitles = document.querySelectorAll('.text-gray-700.font-medium');
+      featureTitles.forEach(title => {
+        content += title.textContent + '。';
+      });
+      
+      // 创建语音对象
+      const speech = new SpeechSynthesisUtterance(content);
+      speech.lang = 'zh-CN';
+      speech.rate = 0.9; // 稍慢语速
+      
+      // 开始朗读
+      window.speechSynthesis.speak(speech);
+      
+      // 更新按钮状态
+      const readAloudBtn = document.getElementById('readAloudBtn');
+      readAloudBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+      
+      // 朗读结束后恢复按钮状态
+      speech.onend = function() {
+        readAloudBtn.innerHTML = '<i class="fa fa-volume-up text-xl"></i>';
+      };
+      
+      // 添加暂停/继续功能
+      readAloudBtn.onclick = function() {
+        if (window.speechSynthesis.speaking) {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+            readAloudBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+          } else {
+            window.speechSynthesis.pause();
+            readAloudBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+          }
+        } else {
+          readPageContentAloud();
+        }
+      };
+    }
+
+    // 初始化时检查朗诵功能状态
+    function initReadAloud() {
+      const isReadAloudEnabled = localStorage.getItem('readAloudEnabled') === 'true';
+      if (isReadAloudEnabled) {
+        addReadAloudButton();
+      }
+    }
+
+    // 页面加载完成后初始化朗诵功能
+    window.addEventListener('load', function() {
+      initReadAloud();
+    });
+  </script>
+
+
+</body></html>

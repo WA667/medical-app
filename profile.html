@@ -1,0 +1,825 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人资料 - 医疗健康应用</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 统一的 Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E88E5',
+            secondary: '#64B5F6',
+            accent: '#0D47A1',
+            light: '#E3F2FD',
+            dark: '#0D47A1'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .dark .glass-effect {
+        background: rgba(17, 24, 39, 0.7);
+      }
+      .card-shadow {
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      }
+      .dark .card-shadow {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .dark .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .transition-all-300 {
+        transition: all 0.3s ease;
+      }
+    }
+  </style>
+  <style>
+    /* 深色模式样式 */
+    .dark {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark body {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark .bg-white {
+      background-color: #1f2937;
+    }
+    
+    .dark .bg-gray-50 {
+      background-color: #111827;
+    }
+    
+    .dark .bg-gray-100 {
+      background-color: #374151;
+    }
+    
+    .dark .bg-gray-200 {
+      background-color: #4b5563;
+    }
+    
+    .dark .bg-gray-500 {
+      background-color: #6b7280;
+    }
+    
+    .dark .bg-blue-50 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-blue-100 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-green-50 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-green-100 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-red-50 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-red-100 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-yellow-50 {
+      background-color: #92400e;
+    }
+    
+    .dark .bg-yellow-100 {
+      background-color: #92400e;
+    }
+    
+    .dark .text-gray-400 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f3f4f6;
+    }
+    
+    .dark .text-gray-800 {
+      color: #f9fafb;
+    }
+    
+    .dark .border-gray-200 {
+      border-color: #374151;
+    }
+    
+    .dark .border-gray-300 {
+      border-color: #4b5563;
+    }
+    
+    .dark .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 深色模式下的light背景色 */
+    .dark .bg-light {
+      background-color: #374151;
+      color: #f3f4f6;
+    }
+    
+    /* 深色模式下的模态框 */
+    .dark #modal .bg-white {
+      background-color: #1f2937;
+    }
+    
+    /* 深色模式下的Toast提示 */
+    .dark #toast {
+      background-color: #374151;
+    }
+    
+    /* 深色模式下的文本区域 */
+    .dark textarea {
+      background-color: #1f2937;
+      color: #f3f4f6;
+      border-color: #4b5563;
+    }
+    
+    /* 深色模式下的文本区域占位符 */
+    .dark textarea::placeholder {
+      color: #9ca3af;
+    }
+    
+    /* 深色模式切换动画 */
+    .dark-transition {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+  <!-- 背景图 -->
+  <div class="fixed inset-0 z-0">
+    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/b767183b860144558006c8b4791dbb63~tplv-a9rns2rl98-image.image?rcl=20251128003627B2B794879B6EBB7CC4EA&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1766853423&amp;x-signature=nl2tade1JahgRXEnO%2B4Rc1e96KE%3D" alt="背景" class="w-full h-full object-cover opacity-20">
+  </div>
+
+  <!-- 主容器 -->
+  <div class="relative z-10 min-h-screen flex flex-col max-w-md mx-auto bg-white shadow-lg overflow-hidden">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" onclick="window.location.href='index.html'">
+        <i class="fa fa-home text-gray-700"></i>
+      </button>
+      
+      <h1 class="text-lg font-semibold text-gray-800">个人资料</h1>
+      
+      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" id="saveProfile">
+        <i class="fa fa-check text-primary"></i>
+      </button>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-1 p-4">
+      <!-- 个人头像和基本信息 -->
+      <div class="text-center mb-6">
+        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-primary mx-auto mb-4 relative cursor-pointer" id="avatarContainer">
+          <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/87b9d38b0c6a45928df584f36eb7a4d1~tplv-a9rns2rl98-image.image?rcl=20251128003627B2B794879B6EBB7CC4EA&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1766853423&amp;x-signature=z7yyENDokh4krE8bRWCNrBRLvn4%3D" alt="用户头像" class="w-full h-full object-cover" id="avatarImage">
+          <button class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+            <i class="fa fa-camera"></i>
+          </button>
+        </div>
+        <div class="relative inline-block">
+          <h2 class="text-xl font-bold text-gray-800 mb-1 cursor-pointer" id="userName">用户</h2>
+          <button class="absolute right-0 top-1/2 transform translate-x-full translate-y-1/2 ml-2 text-primary opacity-0 transition-opacity duration-300" id="editNameBtn">
+            <i class="fa fa-pencil"></i>
+          </button>
+        </div>
+        <p class="text-gray-500">健康等级: A+</p>
+      </div>
+      
+      <!-- 头像选择模态框 -->
+      <div id="avatarModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black opacity-50" id="avatarModalOverlay"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+          <div class="p-5">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">选择头像</h3>
+            
+            <div class="mb-4">
+              <p class="text-gray-600 mb-2">应用图标</p>
+              <div class="grid grid-cols-3 gap-4">
+                <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white cursor-pointer hover:ring-2 hover:ring-primary" data-avatar-type="icon" data-avatar-value="user">
+                  <i class="fa fa-user text-2xl"></i>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white cursor-pointer hover:ring-2 hover:ring-primary" data-avatar-type="icon" data-avatar-value="user-md">
+                  <i class="fa fa-user-md text-2xl"></i>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center text-white cursor-pointer hover:ring-2 hover:ring-primary" data-avatar-type="icon" data-avatar-value="heartbeat">
+                  <i class="fa fa-heartbeat text-2xl"></i>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-purple-500 flex items-center justify-center text-white cursor-pointer hover:ring-2 hover:ring-primary" data-avatar-type="icon" data-avatar-value="user-circle">
+                  <i class="fa fa-user-circle text-2xl"></i>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center text-white cursor-pointer hover:ring-2 hover:ring-primary" data-avatar-type="icon" data-avatar-value="child">
+                  <i class="fa fa-child text-2xl"></i>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white cursor-pointer hover:ring-2 hover:ring-primary" data-avatar-type="icon" data-avatar-value="female">
+                  <i class="fa fa-female text-2xl"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <p class="text-gray-600 mb-2">本地图片</p>
+              <div class="relative">
+                <input type="file" id="avatarUpload" accept="image/*" class="hidden">
+                <label for="avatarUpload" class="block w-full py-3 bg-gray-100 text-gray-700 rounded-lg text-center cursor-pointer hover:bg-gray-200 transition-colors">
+                  <i class="fa fa-upload mr-2"></i> 上传图片
+                </label>
+              </div>
+            </div>
+            
+            <div class="flex justify-end">
+              <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium mr-2 hover:bg-gray-300 transition-colors" id="cancelAvatarBtn">
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 用户名编辑模态框 -->
+      <div id="nameModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black opacity-50" id="nameModalOverlay"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+          <div class="p-5">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">修改用户名</h3>
+            
+            <div class="mb-4">
+              <p class="text-gray-600 mb-2">请输入您的真实姓名（方便医疗服务）</p>
+              <input type="text" id="newNameInput" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="请输入您的姓名">
+              <p class="text-xs text-gray-500 mt-1">修改次数剩余: <span id="nameChangeCount">2</span> 次</p>
+            </div>
+            
+            <div class="flex justify-end">
+              <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium mr-2 hover:bg-gray-300 transition-colors" id="cancelNameBtn">
+                取消
+              </button>
+              <button class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-accent transition-colors" id="confirmNameBtn">
+                确认
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 个人信息编辑区域 -->
+      <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">基本信息</h3>
+        
+        <div class="space-y-4">
+          <!-- 性别 -->
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">性别</span>
+            <div class="flex space-x-4">
+              <label class="flex items-center">
+                <input type="radio" name="gender" value="male" class="mr-2 text-primary" checked="">
+                <span class="text-gray-700">男</span>
+              </label>
+              <label class="flex items-center">
+                <input type="radio" name="gender" value="female" class="mr-2 text-primary">
+                <span class="text-gray-700">女</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- 年龄 -->
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">年龄</span>
+            <input type="number" value="30" min="0" max="120" class="w-20 px-2 py-1 border border-gray-300 rounded text-center">
+          </div>
+          
+          <!-- 身高 -->
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">身高 (cm)</span>
+            <input type="number" value="175" min="0" max="250" class="w-20 px-2 py-1 border border-gray-300 rounded text-center">
+          </div>
+          
+          <!-- 体重 -->
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">体重 (kg)</span>
+            <input type="number" value="68" min="0" max="300" step="0.1" class="w-20 px-2 py-1 border border-gray-300 rounded text-center">
+          </div>
+          
+          <!-- 血型 -->
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">血型</span>
+            <select class="px-2 py-1 border border-gray-300 rounded">
+              <option>A型</option>
+              <option>B型</option>
+              <option>AB型</option>
+              <option selected="">O型</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 医疗历史 -->
+      <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">医疗历史</h3>
+        
+        <div class="space-y-4">
+          <!-- 用药史 -->
+          <div>
+            <label class="block text-gray-700 mb-1">用药史</label>
+            <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="请输入您的用药史...">降压药、降糖药</textarea>
+          </div>
+          
+          <!-- 手术史 -->
+          <div>
+            <label class="block text-gray-700 mb-1">手术史</label>
+            <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="请输入您的手术史...">阑尾切除手术 (2020年)</textarea>
+          </div>
+          
+          <!-- 家族遗传病 -->
+          <div>
+            <label class="block text-gray-700 mb-1">家族遗传病</label>
+            <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="请输入您的家族遗传病...">高血压</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 健康状况 -->
+      <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">健康状况</h3>
+        
+        <div class="space-y-4">
+          <!-- 基础疾病 -->
+          <div>
+            <label class="block text-gray-700 mb-1">基础疾病</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-light text-primary rounded-full text-sm flex items-center">
+                高血压 <button class="ml-1 text-xs">×</button>
+              </span>
+              <span class="px-3 py-1 bg-light text-primary rounded-full text-sm flex items-center">
+                糖尿病 <button class="ml-1 text-xs">×</button>
+              </span>
+              <button class="px-3 py-1 border border-dashed border-gray-300 rounded-full text-sm text-gray-500">
+                + 添加
+              </button>
+            </div>
+          </div>
+          
+          <!-- 不良嗜好 -->
+          <div>
+            <label class="block text-gray-700 mb-1">不良嗜好</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-light text-primary rounded-full text-sm flex items-center">
+                吸烟 <button class="ml-1 text-xs">×</button>
+              </span>
+              <button class="px-3 py-1 border border-dashed border-gray-300 rounded-full text-sm text-gray-500">
+                + 添加
+              </button>
+            </div>
+          </div>
+          
+          <!-- 其他 -->
+          <div>
+            <label class="block text-gray-700 mb-1">其他</label>
+            <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="请输入其他相关信息...">对青霉素过敏</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 紧急联系人 -->
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-700">紧急联系人</h3>
+          <button class="text-primary text-sm">
+            <i class="fa fa-plus mr-1"></i> 添加
+          </button>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-light rounded-lg">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white mr-3">
+                <i class="fa fa-user"></i>
+              </div>
+              <div>
+                <h4 class="text-gray-800 font-medium">张先生</h4>
+                <p class="text-xs text-gray-500">关系: 配偶</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-gray-700">13800138000</p>
+              <button class="text-xs text-primary mt-1">编辑</button>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 bg-light rounded-lg">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white mr-3">
+                <i class="fa fa-user"></i>
+              </div>
+              <div>
+                <h4 class="text-gray-800 font-medium">李女士</h4>
+                <p class="text-xs text-gray-500">关系: 母亲</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-gray-700">13900139000</p>
+              <button class="text-xs text-primary mt-1">编辑</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 设置选项 -->
+    <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">设置</h3>
+      
+      <div class="space-y-3">
+        <div class="flex items-center justify-between p-3 bg-light rounded-lg cursor-pointer" onclick="window.location.href='privacy.html'">
+          <div class="flex items-center">
+            <i class="fa fa-shield text-primary mr-3"></i>
+            <span class="text-gray-700">隐私设置</span>
+          </div>
+          <i class="fa fa-chevron-right text-gray-400"></i>
+        </div>
+        
+        <div class="flex items-center justify-between p-3 bg-light rounded-lg cursor-pointer" onclick="window.location.href='about.html'">
+          <div class="flex items-center">
+            <i class="fa fa-info-circle text-primary mr-3"></i>
+            <span class="text-gray-700">关于我们</span>
+          </div>
+          <i class="fa fa-chevron-right text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+  </main>
+
+    <!-- 底部导航栏 -->
+    <footer class="bg-white shadow-sm p-3 flex justify-around">
+      <div class="flex flex-col items-center cursor-pointer text-gray-400 hover:text-primary transition-all-300" onclick="window.location.href='index.html'">
+        <i class="fa fa-home text-xl"></i>
+        <span class="text-xs mt-1">首页</span>
+      </div>
+      
+      <div class="flex flex-col items-center cursor-pointer text-gray-400 hover:text-primary transition-all-300" onclick="window.location.href='record.html'">
+        <i class="fa fa-file-text text-xl"></i>
+        <span class="text-xs mt-1">记录</span>
+      </div>
+      
+      <div class="flex flex-col items-center cursor-pointer text-primary">
+        <i class="fa fa-user-circle text-xl"></i>
+        <span class="text-xs mt-1">我的</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // 从本地存储获取用户数据
+    function getUserData() {
+      const userData = localStorage.getItem('userData');
+      return userData ? JSON.parse(userData) : {
+        name: '用户',
+        avatar: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/87b9d38b0c6a45928df584f36eb7a4d1~tplv-a9rns2rl98-image.image?rcl=20251128003627B2B794879B6EBB7CC4EA&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1766853423&x-signature=z7yyENDokh4krE8bRWCNrBRLvn4%3D',
+        nameChangeCount: 2
+      };
+    }
+    
+    // 保存用户数据到本地存储
+    function saveUserData(userData) {
+      localStorage.setItem('userData', JSON.stringify(userData));
+    }
+    
+    // 更新UI显示
+    function updateUI() {
+      const userData = getUserData();
+      document.getElementById('userName').textContent = userData.name;
+      document.getElementById('avatarImage').src = userData.avatar;
+      document.getElementById('nameChangeCount').textContent = userData.nameChangeCount;
+      
+      // 如果没有修改次数了，禁用编辑按钮
+      if (userData.nameChangeCount <= 0) {
+        document.getElementById('editNameBtn').style.display = 'none';
+      }
+    }
+    
+    // 初始化页面
+    updateUI();
+    
+    // 保存个人资料
+    document.getElementById('saveProfile').addEventListener('click', function() {
+      // 模拟保存操作
+      const savingToast = document.createElement('div');
+      savingToast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg z-50';
+      savingToast.textContent = '正在保存...';
+      document.body.appendChild(savingToast);
+      
+      setTimeout(() => {
+        savingToast.textContent = '保存成功';
+        
+        setTimeout(() => {
+          document.body.removeChild(savingToast);
+          window.history.back();
+        }, 1000);
+      }, 1500);
+    });
+    
+    // 头像选择功能
+    const avatarContainer = document.getElementById('avatarContainer');
+    const avatarModal = document.getElementById('avatarModal');
+    const avatarModalOverlay = document.getElementById('avatarModalOverlay');
+    const cancelAvatarBtn = document.getElementById('cancelAvatarBtn');
+    const avatarUpload = document.getElementById('avatarUpload');
+    
+    // 打开头像选择模态框
+    avatarContainer.addEventListener('click', function() {
+      avatarModal.classList.remove('hidden');
+    });
+    
+    // 关闭头像选择模态框
+    cancelAvatarBtn.addEventListener('click', function() {
+      avatarModal.classList.add('hidden');
+    });
+    
+    avatarModalOverlay.addEventListener('click', function() {
+      avatarModal.classList.add('hidden');
+    });
+    
+    // 选择应用图标作为头像
+    document.querySelectorAll('[data-avatar-type="icon"]').forEach(icon => {
+      icon.addEventListener('click', function() {
+        const iconName = this.getAttribute('data-avatar-value');
+        const userData = getUserData();
+        
+        // 创建一个新的头像图片
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        const ctx = canvas.getContext('2d');
+        
+        // 获取图标的背景颜色
+        const bgColor = getComputedStyle(this).backgroundColor;
+        
+        // 绘制圆形背景
+        ctx.beginPath();
+        ctx.arc(50, 50, 50, 0, Math.PI * 2);
+        ctx.fillStyle = bgColor;
+        ctx.fill();
+        
+        // 保存当前的用户数据和头像
+        const oldAvatar = userData.avatar;
+        
+        // 更新用户数据
+        userData.avatar = canvas.toDataURL('image/png');
+        saveUserData(userData);
+        
+        // 更新UI
+        updateUI();
+        
+        // 关闭模态框
+        avatarModal.classList.add('hidden');
+        
+        // 显示提示
+        showToast('头像已更新');
+      });
+    });
+    
+    // 上传本地图片作为头像
+    avatarUpload.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const userData = getUserData();
+          userData.avatar = e.target.result;
+          saveUserData(userData);
+          
+          // 更新UI
+          updateUI();
+          
+          // 关闭模态框
+          avatarModal.classList.add('hidden');
+          
+          // 显示提示
+          showToast('头像已更新');
+          
+          // 重置文件输入
+          avatarUpload.value = '';
+        };
+        
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // 用户名编辑功能
+    const userName = document.getElementById('userName');
+    const editNameBtn = document.getElementById('editNameBtn');
+    const nameModal = document.getElementById('nameModal');
+    const nameModalOverlay = document.getElementById('nameModalOverlay');
+    const cancelNameBtn = document.getElementById('cancelNameBtn');
+    const confirmNameBtn = document.getElementById('confirmNameBtn');
+    const newNameInput = document.getElementById('newNameInput');
+    const nameChangeCount = document.getElementById('nameChangeCount');
+    
+    // 显示编辑按钮
+    userName.addEventListener('mouseenter', function() {
+      const userData = getUserData();
+      if (userData.nameChangeCount > 0) {
+        editNameBtn.style.opacity = '1';
+      }
+    });
+    
+    userName.addEventListener('mouseleave', function() {
+      editNameBtn.style.opacity = '0';
+    });
+    
+    // 打开用户名编辑模态框
+    userName.addEventListener('click', function() {
+      const userData = getUserData();
+      if (userData.nameChangeCount > 0) {
+        newNameInput.value = userData.name;
+        nameModal.classList.remove('hidden');
+        newNameInput.focus();
+      } else {
+        showToast('您已没有修改用户名的次数');
+      }
+    });
+    
+    editNameBtn.addEventListener('click', function() {
+      const userData = getUserData();
+      if (userData.nameChangeCount > 0) {
+        newNameInput.value = userData.name;
+        nameModal.classList.remove('hidden');
+        newNameInput.focus();
+      } else {
+        showToast('您已没有修改用户名的次数');
+      }
+    });
+    
+    // 关闭用户名编辑模态框
+    cancelNameBtn.addEventListener('click', function() {
+      nameModal.classList.add('hidden');
+    });
+    
+    nameModalOverlay.addEventListener('click', function() {
+      nameModal.classList.add('hidden');
+    });
+    
+    // 确认修改用户名
+    confirmNameBtn.addEventListener('click', function() {
+      const newName = newNameInput.value.trim();
+      if (!newName) {
+        showToast('请输入用户名');
+        return;
+      }
+      
+      const userData = getUserData();
+      
+      // 检查是否还有修改次数
+      if (userData.nameChangeCount <= 0) {
+        showToast('您已没有修改用户名的次数');
+        nameModal.classList.add('hidden');
+        return;
+      }
+      
+      // 检查是否与原用户名相同
+      if (newName === userData.name) {
+        showToast('用户名未改变');
+        nameModal.classList.add('hidden');
+        return;
+      }
+      
+      // 更新用户名和修改次数
+      userData.name = newName;
+      userData.nameChangeCount--;
+      saveUserData(userData);
+      
+      // 更新UI
+      updateUI();
+      
+      // 关闭模态框
+      nameModal.classList.add('hidden');
+      
+      // 显示提示
+      if (userData.nameChangeCount > 0) {
+        showToast(`用户名已更新，剩余修改次数: ${userData.nameChangeCount}`);
+      } else {
+        showToast('用户名已更新，您已没有修改次数');
+      }
+    });
+    
+    // 显示提示信息
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg z-50';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 2000);
+    }
+
+    // 删除标签功能
+    document.querySelectorAll('.bg-light button').forEach(button => {
+      button.addEventListener('click', function() {
+        this.parentElement.remove();
+      });
+    });
+
+    // 添加标签功能
+    document.querySelectorAll('.border-dashed').forEach(button => {
+      button.addEventListener('click', function() {
+        const category = this.parentElement.previousElementSibling.textContent.trim();
+        const value = prompt(`请输入${category}:`);
+        
+        if (value && value.trim()) {
+          const newTag = document.createElement('span');
+          newTag.className = 'px-3 py-1 bg-light text-primary rounded-full text-sm flex items-center';
+          newTag.innerHTML = `${value.trim()} <button class="ml-1 text-xs">×</button>`;
+          
+          // 添加删除功能
+          newTag.querySelector('button').addEventListener('click', function() {
+            newTag.remove();
+          });
+          
+          this.parentNode.insertBefore(newTag, this);
+        }
+      });
+    });
+
+    // 编辑紧急联系人
+    document.querySelectorAll('.text-primary.mt-1').forEach(button => {
+      button.addEventListener('click', function() {
+        const contactCard = this.closest('.bg-light');
+        const name = contactCard.querySelector('h4').textContent;
+        const relation = contactCard.querySelector('p.text-xs').textContent.split(': ')[1];
+        const phone = contactCard.querySelector('.text-gray-700').textContent;
+        
+        const newName = prompt('联系人姓名:', name);
+        if (newName !== null) {
+          const newRelation = prompt('关系:', relation);
+          if (newRelation !== null) {
+            const newPhone = prompt('电话号码:', phone);
+            if (newPhone !== null) {
+              contactCard.querySelector('h4').textContent = newName;
+              contactCard.querySelector('p.text-xs').textContent = `关系: ${newRelation}`;
+              contactCard.querySelector('.text-gray-700').textContent = newPhone;
+            }
+          }
+        }
+      });
+    });
+    
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 应用深色模式
+      const isDarkModeEnabled = localStorage.getItem('darkModeEnabled') === 'true';
+      if (isDarkModeEnabled) {
+        document.documentElement.classList.add('dark');
+      }
+    });
+  </script>
+
+

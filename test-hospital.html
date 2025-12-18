@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>附近医院测试 - 医疗健康助手</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 高德地图 API 安全配置 -->
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: '8b978fe4ad0ded2b65ad21c12cede722' // 安全密钥，实际使用时请替换为自己的
+        };
+    </script>
+    <!-- 高德地图 Loader -->
+    <script type="text/javascript" src="https://webapi.amap.com/loader.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        accent: '#2563eb',
+                        dark: {
+                            100: '#1e293b',
+                            200: '#0f172a',
+                            300: '#020617'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        }
+    </style>
+    <style>
+        #mapContainer {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        .test-info {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .test-info.error {
+            border-left-color: #ef4444;
+        }
+        
+        .test-info.success {
+            border-left-color: #10b981;
+        }
+        
+        .test-info.warning {
+            border-left-color: #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-200 dark:text-gray-200">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6 text-primary">附近医院功能测试</h1>
+        
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">测试步骤</h2>
+            <ol class="list-decimal list-inside space-y-2">
+                <li>点击"开始测试"按钮</li>
+                <li>允许浏览器获取位置权限</li>
+                <li>查看地图加载情况</li>
+                <li>查看附近医院搜索结果</li>
+            </ol>
+        </div>
+        
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">测试结果</h2>
+            
+            <div id="testResults" class="space-y-4">
+                <div class="test-info">
+                    <p>等待测试开始...</p>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <button id="startTest" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300">
+                    开始测试
+                </button>
+                <button id="resetTest" class="ml-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-lg transition-colors duration-300">
+                    重置测试
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">地图显示</h2>
+            <div id="mapContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let map = null;
+        let userLocation = null;
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            document.getElementById('startTest').addEventListener('click', startTest);
+            document.getElementById('resetTest').addEventListener('click', resetTest);
+        });
+        
+        // 开始测试
+        function startTest() {
+            // 清空测试结果
+            const testResults = document.getElementById('testResults');
+            testResults.innerHTML = '';
+            
+            // 添加测试开始信息
+            addTestInfo('测试开始', '正在初始化地图...');
+            
+            // 加载高德地图 API
+            loadAMapAPI();
+        }
+        
+        // 重置测试
+        function resetTest() {
+            // 清空测试结果
+            const testResults = document.getElementById('testResults');
+            testResults.innerHTML = `
+                <div class="test-info">
+                    <p>等待测试开始...</p>
+                </div>
+            `;
+            
+            // 销毁地图实例
+            if (map) {
+                map.destroy();
+                map = null;
+            }
+            
+            // 重置用户位置
+            userLocation = null;
+        }
+        
+        // 加载高德地图 API
+        function loadAMapAPI() {
+            addTestInfo('加载地图 API', '正在加载高德地图 API...');
+            
+            AMapLoader.load({
+                key: 'e2069701097323600495381205600431', // 替换为自己的 API Key
+                version: '2.0',
+                plugins: ['AMap.Scale', 'AMap.ToolBar', 'AMap.Geocoder', 'AMap.PlaceSearch'],
+                AMapUI: {
+                    version: '1.1',
+                    plugins: []
+                }
+            }).then(function(AMap) {
+                // API 加载成功
+                addTestInfo('加载地图 API', '高德地图 API 加载成功', 'success');
+                
+                // 保存 AMap 对象
+                window.AMap = AMap;
+                
+                // 初始化地图
+                initMap();
+            }).catch(function(e) {
+                // API 加载失败
+                console.error('高德地图 API 加载失败:', e);
+                addTestInfo('加载地图 API', `高德地图 API 加载失败: ${e.message}`, 'error');
+            });
+        }
+        
+        // 初始化地图
+        function initMap() {
+            addTestInfo('初始化地图', '正在创建地图实例...');
+            
+            try {
+                // 创建地图实例
+                map = new AMap.Map('mapContainer', {
+                    zoom: 14,
+                    resizeEnable: true,
+                    zoomEnable: true,
+                    dragEnable: true,
+                    center: [116.397428, 39.90923] // 默认北京
+                });
+                
+                // 添加地图控件
+                map.addControl(new AMap.Scale());
+                map.addControl(new AMap.ToolBar({
+                    position: 'RB'
+                }));
+                
+                addTestInfo('初始化地图', '地图实例创建成功', 'success');
+                
+                // 检查浏览器是否支持地理定位
+                if (navigator.geolocation) {
+                    addTestInfo('获取位置', '正在请求用户位置...');
+                    
+                    // 请求用户位置
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            // 位置获取成功
+                            userLocation = {
+                                lng: position.coords.longitude,
+                                lat: position.coords.latitude
+                            };
+                            
+                            addTestInfo('获取位置', `位置获取成功: ${userLocation.lng}, ${userLocation.lat}`, 'success');
+                            
+                            // 将地图中心移动到用户位置
+                            map.setCenter([userLocation.lng, userLocation.lat]);
+                            
+                            // 添加用户位置标记
+                            addUserMarker();
+                            
+                            // 获取附近医院
+                            searchNearbyHospitals();
+                        },
+                        error => {
+                            // 位置获取失败
+                            handleLocationError(error);
+                        }
+                    );
+                } else {
+                    // 浏览器不支持地理定位
+                    addTestInfo('获取位置', '您的浏览器不支持地理定位功能', 'error');
+                }
+            } catch (e) {
+                addTestInfo('初始化地图', `地图初始化失败: ${e.message}`, 'error');
+            }
+        }
+        
+        // 添加用户位置标记
+        function addUserMarker() {
+            try {
+                const userMarker = new AMap.Marker({
+                    position: [userLocation.lng, userLocation.lat],
+                    icon: new AMap.Icon({
+                        size: new AMap.Size(30, 30),
+                        image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+                        imageSize: new AMap.Size(30, 30)
+                    }),
+                    title: '您的位置',
+                    anchor: 'bottom-center'
+                });
+                
+                userMarker.setMap(map);
+                
+                addTestInfo('添加标记', '用户位置标记添加成功', 'success');
+                
+                // 添加用户位置信息提示
+                const geocoder = new AMap.Geocoder({
+                    radius: 1000,
+                    extensions: "all"
+                });
+                
+                geocoder.getAddress([userLocation.lng, userLocation.lat], function(status, result) {
+                    if (status === 'complete' && result.info === 'OK') {
+                        const address = result.regeocode.formattedAddress;
+                        addTestInfo('逆地理编码', `位置解析成功: ${address}`, 'success');
+                    } else {
+                        addTestInfo('逆地理编码', '位置解析失败', 'warning');
+                    }
+                });
+            } catch (e) {
+                addTestInfo('添加标记', `添加用户标记失败: ${e.message}`, 'error');
+            }
+        }
+        
+        // 搜索附近医院
+        function searchNearbyHospitals() {
+            addTestInfo('搜索医院', '正在搜索附近医院...');
+            
+            try {
+                // 创建POI搜索实例
+                const placeSearch = new AMap.PlaceSearch({
+                    pageSize: 20,
+                    pageIndex: 1,
+                    types: '090100|090101|090102|090103|090200', // 医院类型
+                    radius: 3000, // 搜索半径3公里
+                    sortrule: 'distance',
+                    citylimit: true,
+                    extensions: 'all'
+                });
+                
+                // 执行周边搜索
+                placeSearch.searchNearBy('', [userLocation.lng, userLocation.lat], 3000, function(status, result) {
+                    console.log('搜索结果:', status, result);
+                    
+                    if (status === 'complete' && result.info === 'OK') {
+                        // 处理搜索结果
+                        if (result.poiList && result.poiList.pois && result.poiList.pois.length > 0) {
+                            addTestInfo('搜索医院', `找到 ${result.poiList.pois.length} 家医院`, 'success');
+                            
+                            // 添加医院标记
+                            addHospitalMarkers(result.poiList.pois);
+                        } else {
+                            addTestInfo('搜索医院', '未找到附近医院', 'warning');
+                        }
+                    } else {
+                        // 搜索失败
+                        let errorMessage = '医院搜索失败';
+                        if (result && result.info) {
+                            errorMessage += `: ${result.info}`;
+                        }
+                        addTestInfo('搜索医院', errorMessage, 'error');
+                    }
+                });
+            } catch (e) {
+                addTestInfo('搜索医院', `搜索医院失败: ${e.message}`, 'error');
+            }
+        }
+        
+        // 添加医院标记
+        function addHospitalMarkers(hospitals) {
+            try {
+                hospitals.forEach(hospital => {
+                    // 创建医院标记
+                    const marker = new AMap.Marker({
+                        position: [hospital.location.lng, hospital.location.lat],
+                        icon: new AMap.Icon({
+                            size: new AMap.Size(24, 24),
+                            image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+                            imageSize: new AMap.Size(24, 24)
+                        }),
+                        title: hospital.name,
+                        anchor: 'bottom-center'
+                    });
+                    
+                    // 添加点击事件
+                    marker.on('click', function() {
+                        showHospitalInfo(hospital);
+                    });
+                    
+                    marker.setMap(map);
+                });
+                
+                addTestInfo('添加标记', `成功添加 ${hospitals.length} 家医院标记`, 'success');
+                
+                // 调整地图视野以显示所有标记
+                const bounds = new AMap.Bounds();
+                bounds.extend([userLocation.lng, userLocation.lat]);
+                
+                hospitals.forEach(hospital => {
+                    bounds.extend([hospital.location.lng, hospital.location.lat]);
+                });
+                
+                map.setBounds(bounds, true);
+                
+                addTestInfo('调整视野', '地图视野调整完成', 'success');
+            } catch (e) {
+                addTestInfo('添加标记', `添加医院标记失败: ${e.message}`, 'error');
+            }
+        }
+        
+        // 显示医院详情
+        function showHospitalInfo(hospital) {
+            // 创建信息窗口
+            const infoWindow = new AMap.InfoWindow({
+                content: `
+                    <div class="p-3">
+                        <h3 class="font-bold">${hospital.name}</h3>
+                        <p class="text-sm">${hospital.address}</p>
+                        <p class="text-sm">距离: ${(hospital.distance / 1000).toFixed(1)}km</p>
+                        ${hospital.tel ? `<p class="text-sm">电话: ${hospital.tel}</p>` : ''}
+                    </div>
+                `,
+                position: [hospital.location.lng, hospital.location.lat],
+                offset: new AMap.Pixel(0, -30)
+            });
+            
+            // 打开信息窗口
+            infoWindow.open(map);
+        }
+        
+        // 处理位置获取错误
+        function handleLocationError(error) {
+            console.error('位置获取失败:', error);
+            
+            let errorMessage = '';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = '您拒绝了位置访问权限，请在设置中开启';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = '位置信息不可用';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = '位置获取超时，请重试';
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage = '未知错误，请重试';
+                    break;
+                default:
+                    errorMessage = '无法获取位置，请重试';
+            }
+            
+            addTestInfo('获取位置', errorMessage, 'error');
+        }
+        
+        // 添加测试信息
+        function addTestInfo(title, message, type = 'info') {
+            const testResults = document.getElementById('testResults');
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = `test-info ${type}`;
+            
+            const time = new Date().toLocaleTimeString();
+            
+            infoDiv.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <h3 class="font-medium">${title}</h3>
+                    <span class="text-xs text-gray-500">${time}</span>
+                </div>
+                <p>${message}</p>
+            `;
+            
+            testResults.appendChild(infoDiv);
+            
+            // 滚动到底部
+            testResults.scrollTop = testResults.scrollHeight;
+        }
+    </script>
+</body>
+</html>

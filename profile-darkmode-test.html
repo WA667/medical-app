@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人资料深色模式测试</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E88E5',
+            secondary: '#64B5F6',
+            accent: '#0D47A1',
+            light: '#E3F2FD',
+            dark: '#0D47A1'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .dark .glass-effect {
+        background: rgba(17, 24, 39, 0.7);
+      }
+      .card-shadow {
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      }
+      .dark .card-shadow {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .dark .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .transition-all-300 {
+        transition: all 0.3s ease;
+      }
+    }
+  </style>
+  
+  <style>
+    /* 深色模式样式 */
+    .dark {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark body {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+    
+    .dark .bg-white {
+      background-color: #1f2937;
+    }
+    
+    .dark .bg-gray-50 {
+      background-color: #111827;
+    }
+    
+    .dark .bg-gray-100 {
+      background-color: #374151;
+    }
+    
+    .dark .bg-gray-200 {
+      background-color: #4b5563;
+    }
+    
+    .dark .bg-gray-500 {
+      background-color: #6b7280;
+    }
+    
+    .dark .bg-blue-50 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-blue-100 {
+      background-color: #1e3a8a;
+    }
+    
+    .dark .bg-green-50 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-green-100 {
+      background-color: #065f46;
+    }
+    
+    .dark .bg-red-50 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-red-100 {
+      background-color: #991b1b;
+    }
+    
+    .dark .bg-yellow-50 {
+      background-color: #92400e;
+    }
+    
+    .dark .bg-yellow-100 {
+      background-color: #92400e;
+    }
+    
+    .dark .text-gray-400 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f3f4f6;
+    }
+    
+    .dark .text-gray-800 {
+      color: #f9fafb;
+    }
+    
+    .dark .border-gray-200 {
+      border-color: #374151;
+    }
+    
+    .dark .border-gray-300 {
+      border-color: #4b5563;
+    }
+    
+    .dark .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 深色模式下的light背景色 */
+    .dark .bg-light {
+      background-color: #374151;
+      color: #f3f4f6;
+    }
+    
+    /* 深色模式下的文本区域 */
+    .dark textarea {
+      background-color: #1f2937;
+      color: #f3f4f6;
+      border-color: #4b5563;
+    }
+    
+    /* 深色模式下的文本区域占位符 */
+    .dark textarea::placeholder {
+      color: #9ca3af;
+    }
+    
+    /* 深色模式切换动画 */
+    .dark-transition {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans dark-transition">
+  <div class="min-h-screen flex flex-col max-w-md mx-auto p-4">
+    <header class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-800">个人资料深色模式测试</h1>
+      <p class="text-gray-600">测试个人资料页面在深色模式下的样式</p>
+    </header>
+    
+    <main class="flex-1 space-y-6">
+      <!-- 深色模式开关 -->
+      <div class="bg-white p-4 rounded-xl shadow-md">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-medium text-gray-800">深色模式</h3>
+            <p class="text-sm text-gray-600">切换应用主题</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="darkModeToggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+      </div>
+      
+      <!-- 医疗历史 -->
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">医疗历史</h3>
+        
+        <div class="space-y-4">
+          <!-- 用药史 -->
+          <div>
+            <label class="block text-gray-700 mb-1">用药史</label>
+            <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="请输入您的用药史...">降压药、降糖药</textarea>
+          </div>
+          
+          <!-- 手术史 -->
+          <div>
+            <label class="block text-gray-700 mb-1">手术史</label>
+            <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="请输入您的手术史...">阑尾切除手术 (2020年)</textarea>
+          </div>
+          
+          <!-- 家族遗传病 -->
+          <div>
+            <label class="block text-gray-700 mb-1">家族遗传病</label>
+            <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="请输入您的家族遗传病...">高血压</textarea>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 健康状况 -->
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">健康状况</h3>
+        
+        <div class="space-y-4">
+          <!-- 基础疾病 -->
+          <div>
+            <label class="block text-gray-700 mb-1">基础疾病</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-light text-primary rounded-full text-sm flex items-center">
+                高血压 <button class="ml-1 text-xs">×</button>
+              </span>
+              <span class="px-3 py-1 bg-light text-primary rounded-full text-sm flex items-center">
+                糖尿病 <button class="ml-1 text-xs">×</button>
+              </span>
+              <button class="px-3 py-1 border border-dashed border-gray-300 rounded-full text-sm text-gray-500">
+                + 添加
+              </button>
+            </div>
+          </div>
+          
+          <!-- 不良嗜好 -->
+          <div>
+            <label class="block text-gray-700 mb-1">不良嗜好</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 bg-light text-primary rounded-full text-sm flex items-center">
+                吸烟 <button class="ml-1 text-xs">×</button>
+              </span>
+              <button class="px-3 py-1 border border-dashed border-gray-300 rounded-full text-sm text-gray-500">
+                + 添加
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 调试信息 -->
+      <div class="bg-white p-4 rounded-xl shadow-md">
+        <h3 class="font-medium text-gray-800 mb-2">调试信息</h3>
+        <div class="text-sm text-gray-600">
+          <p>深色模式状态: <span id="darkModeStatus">禁用</span></p>
+          <p>当前类列表: <span id="classList">[]</span></p>
+        </div>
+      </div>
+    </main>
+    
+    <footer class="mt-8 text-center text-sm text-gray-500">
+      <p>© 2025 医疗健康应用 - 深色模式测试</p>
+    </footer>
+  </div>
+  
+  <script>
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 获取深色模式开关
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      
+      // 从本地存储加载状态
+      const isDarkModeEnabled = localStorage.getItem('darkModeEnabled') === 'true';
+      darkModeToggle.checked = isDarkModeEnabled;
+      
+      // 应用深色模式
+      if (isDarkModeEnabled) {
+        document.documentElement.classList.add('dark');
+      }
+      
+      // 更新调试信息
+      updateDebugInfo();
+      
+      // 添加深色模式开关事件
+      darkModeToggle.addEventListener('change', function() {
+        if (this.checked) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('darkModeEnabled', 'true');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('darkModeEnabled', 'false');
+        }
+        updateDebugInfo();
+      });
+    });
+    
+    // 更新调试信息
+    function updateDebugInfo() {
+      const isDarkModeEnabled = document.documentElement.classList.contains('dark');
+      document.getElementById('darkModeStatus').textContent = isDarkModeEnabled ? '启用' : '禁用';
+      document.getElementById('classList').textContent = JSON.stringify(Array.from(document.documentElement.classList));
+    }
+  </script>
+</body>
+</html>

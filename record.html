@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>健康记录 - 医疗健康应用</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            accent: '#1E88E5',
+            light: '#F3F4F6',
+            dark: '#1F2937',
+            'dark-light': '#374151',
+            'dark-lighter': '#4B5563'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      
+      /* 深色模式切换动画 */
+      .dark-transition {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      /* 自定义滚动条 */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+      }
+      
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+      
+      /* 深色模式下的滚动条 */
+      .dark .custom-scrollbar::-webkit-scrollbar-track {
+        background: #374151;
+      }
+      
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #6B7280;
+      }
+      
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #9CA3AF;
+      }
+    }
+  </style>
+  
+  <style>
+    /* 基础样式 */
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #f9fafb;
+    }
+    
+    /* 深色模式样式 */
+    .dark {
+      color-scheme: dark;
+    }
+    
+    .dark body {
+      background-color: #111827;
+    }
+    
+    .dark .bg-white {
+      background-color: #1f2937;
+    }
+    
+    .dark .text-gray-800 {
+      color: #f9fafb;
+    }
+    
+    .dark .text-gray-700 {
+      color: #f3f4f6;
+    }
+    
+    .dark .text-gray-600 {
+      color: #d1d5db;
+    }
+    
+    .dark .text-gray-500 {
+      color: #9ca3af;
+    }
+    
+    .dark .text-gray-400 {
+      color: #9ca3af;
+    }
+    
+    .dark .border-gray-200 {
+      border-color: #374151;
+    }
+    
+    .dark .border-gray-300 {
+      border-color: #4b5563;
+    }
+    
+    .dark .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 深色模式下的模态框 */
+    .dark #modal .bg-white {
+      background-color: #1f2937;
+    }
+    
+    /* 深色模式下的Toast提示 */
+    .dark #toast {
+      background-color: #374151;
+    }
+    
+    /* 深色模式切换动画 */
+    .dark-transition {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans dark-transition">
+  <!-- 背景图 -->
+  <div class="fixed inset-0 z-0">
+    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/b767183b860144558006c8b4791dbb63~tplv-a9rns2rl98-image.image?rcl=20251128003627B2B794879B6EBB7CC4EA&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1766853423&x-signature=nl2tade1JahgRXEnO%2B4Rc1e96KE%3D" 
+         alt="背景" 
+         class="w-full h-full object-cover opacity-20">
+  </div>
+
+  <!-- 主容器 -->
+  <div class="relative z-10 min-h-screen flex flex-col max-w-md mx-auto bg-white shadow-lg overflow-hidden dark:bg-dark dark-transition">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center dark:bg-dark dark:text-white dark-transition">
+      <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-dark-light dark-transition" onclick="window.location.href='index.html'">
+        <i class="fa fa-home text-gray-700 dark:text-gray-300"></i>
+      </button>
+      
+      <h1 class="text-lg font-semibold text-gray-800 dark:text-white">健康记录</h1>
+      
+      <div class="flex items-center space-x-2">
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-dark-light dark-transition" id="filterBtn">
+          <i class="fa fa-filter text-gray-700 dark:text-gray-300"></i>
+        </button>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-dark-light dark-transition" id="addRecordBtn">
+          <i class="fa fa-plus text-gray-700 dark:text-gray-300"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-1 p-4">
+      <!-- 健康数据概览 -->
+      <div class="bg-white rounded-xl shadow-md p-4 mb-6 dark:bg-dark-light dark:text-white dark-transition">
+        <h2 class="text-lg font-semibold text-gray-700 dark:text-white mb-4">健康数据概览</h2>
+        <div class="h-48">
+          <canvas id="healthChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 分诊记录列表 -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold text-gray-700 dark:text-white">分诊记录</h2>
+          <div class="flex items-center">
+            <select id="sortSelect" class="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition">
+              <option value="time-desc">时间（最新）</option>
+              <option value="time-asc">时间（最早）</option>
+              <option value="severity-desc">严重程度（高到低）</option>
+              <option value="severity-asc">严重程度（低到高）</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="recordsList" class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+          <!-- 记录列表将通过JavaScript动态生成 -->
+          <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <i class="fa fa-file-text-o text-4xl mb-2"></i>
+            <p>暂无分诊记录</p>
+            <p class="text-sm mt-1">点击右上角"+"按钮添加记录</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <footer class="bg-white shadow-sm p-3 flex justify-around items-center dark:bg-dark dark:text-white dark-transition">
+      <button class="flex flex-col items-center justify-center w-1/4 py-1 hover:bg-gray-50 dark:hover:bg-dark-light dark-transition" onclick="window.location.href='index.html'">
+        <i class="fa fa-home text-lg text-gray-600 dark:text-gray-300"></i>
+        <span class="text-xs mt-1 text-gray-600 dark:text-gray-300">首页</span>
+      </button>
+      
+      <button class="flex flex-col items-center justify-center w-1/4 py-1 hover:bg-gray-50 dark:hover:bg-dark-light dark-transition" onclick="window.location.href='record.html'">
+        <i class="fa fa-heartbeat text-lg text-primary"></i>
+        <span class="text-xs mt-1 text-primary">健康记录</span>
+      </button>
+      
+      <button class="flex flex-col items-center justify-center w-1/4 py-1 hover:bg-gray-50 dark:hover:bg-dark-light dark-transition" onclick="window.location.href='profile.html'">
+        <i class="fa fa-user text-lg text-gray-600 dark:text-gray-300"></i>
+        <span class="text-xs mt-1 text-gray-600 dark:text-gray-300">我的</span>
+      </button>
+    </footer>
+  </div>
+
+  <!-- 筛选模态框 -->
+  <div id="filterModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black opacity-50" id="filterModalOverlay"></div>
+    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 overflow-hidden transform transition-all dark:bg-dark-light dark:text-white dark-transition">
+      <div class="p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">筛选记录</h3>
+          <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-dark-lighter dark-transition" id="closeFilterBtn">
+            <i class="fa fa-times text-gray-700 dark:text-gray-300"></i>
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">症状分类</label>
+            <select id="categoryFilter" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition">
+              <option value="all">全部分类</option>
+              <option value="呼吸系统">呼吸系统</option>
+              <option value="消化系统">消化系统</option>
+              <option value="神经系统">神经系统</option>
+              <option value="心血管系统">心血管系统</option>
+              <option value="皮肤">皮肤问题</option>
+              <option value="全身症状">全身症状</option>
+              <option value="其他症状">其他症状</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">严重程度</label>
+            <div class="space-y-2">
+              <div class="flex items-center">
+                <input type="checkbox" id="severityHigh" class="mr-2" checked>
+                <label for="severityHigh" class="text-sm text-gray-700 dark:text-gray-300">高风险</label>
+              </div>
+              <div class="flex items-center">
+                <input type="checkbox" id="severityMedium" class="mr-2" checked>
+                <label for="severityMedium" class="text-sm text-gray-700 dark:text-gray-300">中风险</label>
+              </div>
+              <div class="flex items-center">
+                <input type="checkbox" id="severityLow" class="mr-2" checked>
+                <label for="severityLow" class="text-sm text-gray-700 dark:text-gray-300">低风险</label>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">日期范围</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="date" id="dateFrom" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition">
+              <input type="date" id="dateTo" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition">
+            </div>
+          </div>
+          
+          <div class="pt-2">
+            <button id="applyFilterBtn" class="w-full py-2 bg-primary text-white rounded-lg hover:bg-accent transition-colors">
+              应用筛选
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 记录详情模态框 -->
+  <div id="recordDetailModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black opacity-50" id="recordDetailModalOverlay"></div>
+    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 overflow-hidden transform transition-all dark:bg-dark-light dark:text-white dark-transition">
+      <div class="p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">记录详情</h3>
+          <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-dark-lighter dark-transition" id="closeDetailBtn">
+            <i class="fa fa-times text-gray-700 dark:text-gray-300"></i>
+          </button>
+        </div>
+        
+        <div id="recordDetailContent" class="space-y-3">
+          <!-- 记录详情内容将通过JavaScript动态填充 -->
+        </div>
+        
+        <div class="flex justify-end mt-5">
+          <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors dark:bg-dark-lighter dark:text-white dark-transition mr-2" id="cancelDetailBtn">
+            关闭
+          </button>
+          <button class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-accent transition-colors" id="shareDetailBtn">
+            <i class="fa fa-share-alt mr-1"></i> 分享
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加记录模态框 -->
+  <div id="addRecordModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black opacity-50" id="addRecordModalOverlay"></div>
+    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 overflow-hidden transform transition-all dark:bg-dark-light dark:text-white dark-transition">
+      <div class="p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">添加健康记录</h3>
+          <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-dark-lighter dark-transition" id="closeAddRecordBtn">
+            <i class="fa fa-times text-gray-700 dark:text-gray-300"></i>
+          </button>
+        </div>
+        
+        <form id="addRecordForm">
+          <div class="mb-4">
+            <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">症状描述</label>
+            <input type="text" id="symptomInput" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition" placeholder="请输入症状描述" required>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">症状分类</label>
+            <select id="categorySelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition" required>
+              <option value="">请选择分类</option>
+              <option value="呼吸系统">呼吸系统</option>
+              <option value="消化系统">消化系统</option>
+              <option value="神经系统">神经系统</option>
+              <option value="心血管系统">心血管系统</option>
+              <option value="皮肤">皮肤问题</option>
+              <option value="全身症状">全身症状</option>
+              <option value="其他症状">其他症状</option>
+            </select>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">详细描述</label>
+            <textarea id="descriptionInput" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition" rows="3" placeholder="请输入详细症状描述"></textarea>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">建议用药（选填）</label>
+            <input type="text" id="medicationInput" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-dark dark:text-white dark:border-dark-lighter dark-transition" placeholder="请输入建议用药，多个药物用逗号分隔">
+          </div>
+          
+          <div class="flex justify-between">
+            <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors dark:bg-dark-lighter dark:text-white dark-transition" id="cancelAddRecordBtn">
+              取消
+            </button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-accent transition-colors">
+              保存记录
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 初始化页面
+    function initPage() {
+      // 初始化健康数据图表
+      initHealthChart();
+      
+      // 加载分诊记录
+      loadTriageRecords();
+      
+      // 初始化筛选功能
+      initFilterFeature();
+      
+      // 初始化记录详情功能
+      initRecordDetailFeature();
+    }
+    
+    // 初始化健康数据图表
+    function initHealthChart() {
+      const ctx = document.getElementById('healthChart').getContext('2d');
+      
+      // 模拟健康数据
+      const dates = [];
+      const heartRateData = [];
+      
+      const today = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        dates.push(`${date.getMonth() + 1}/${date.getDate()}`);
+        
+        // 生成随机数据
+        heartRateData.push(Math.floor(Math.random() * 10) + 70); // 70-80
+      }
+      
+      const healthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: '心率',
+            data: heartRateData,
+            borderColor: '#1E88E5',
+            backgroundColor: 'rgba(30, 136, 229, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#374151'
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 60,
+              max: 100,
+              ticks: {
+                color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+              },
+              grid: {
+                color: document.documentElement.classList.contains('dark') ? 'rgba(75, 85, 99, 0.3)' : 'rgba(229, 231, 235, 0.5)'
+              }
+            },
+            x: {
+              ticks: {
+                color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+              },
+              grid: {
+                color: document.documentElement.classList.contains('dark') ? 'rgba(75, 85, 99, 0.3)' : 'rgba(229, 231, 235, 0.5)'
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // 加载分诊记录
+    function loadTriageRecords() {
+      const recordsList = document.getElementById('recordsList');
+      const triageResults = JSON.parse(localStorage.getItem('triageResults') || '[]');
+      
+      // 清空列表
+      recordsList.innerHTML = '';
+      
+      if (triageResults.length === 0) {
+        recordsList.innerHTML = `
+          <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <i class="fa fa-file-text-o text-4xl mb-2"></i>
+            <p>暂无分诊记录</p>
+            <p class="text-sm mt-1">点击右上角"+"按钮添加记录</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // 按时间戳降序排序
+      triageResults.sort((a, b) => b.timestamp - a.timestamp);
+      
+      // 添加记录到列表
+      triageResults.forEach(record => {
+        const recordItem = document.createElement('div');
+        recordItem.className = 'bg-white rounded-lg shadow-sm p-3 border-l-4 dark:bg-dark-light dark:text-white dark-transition cursor-pointer';
+        
+        // 根据严重程度设置边框颜色
+        if (record.severity === '高风险') {
+          recordItem.classList.add('border-red-500');
+        } else if (record.severity === '中风险') {
+          recordItem.classList.add('border-yellow-500');
+        } else {
+          recordItem.classList.add('border-green-500');
+        }
+        
+        // 记录内容
+        recordItem.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-medium text-gray-800 dark:text-white">${record.symptom}</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${record.date}</p>
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full ${getSeverityClass(record.severity)}">${record.severity}</span>
+          </div>
+          <div class="mt-2">
+            <p class="text-sm text-gray-600 dark:text-gray-300">${record.category}</p>
+          </div>
+        `;
+        
+        // 添加点击事件
+        recordItem.addEventListener('click', function() {
+          showRecordDetail(record);
+        });
+        
+        recordsList.appendChild(recordItem);
+      });
+    }
+    
+    // 获取严重程度对应的样式类
+    function getSeverityClass(severity) {
+      if (severity === '高风险') {
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      } else if (severity === '中风险') {
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      } else {
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      }
+    }
+    
+    // 初始化筛选功能
+    function initFilterFeature() {
+      const filterBtn = document.getElementById('filterBtn');
+      const filterModal = document.getElementById('filterModal');
+      const closeFilterBtn = document.getElementById('closeFilterBtn');
+      const filterModalOverlay = document.getElementById('filterModalOverlay');
+      const applyFilterBtn = document.getElementById('applyFilterBtn');
+      
+      // 打开筛选模态框
+      filterBtn.addEventListener('click', function() {
+        filterModal.classList.remove('hidden');
+      });
+      
+      // 关闭筛选模态框
+      closeFilterBtn.addEventListener('click', function() {
+        filterModal.classList.add('hidden');
+      });
+      
+      filterModalOverlay.addEventListener('click', function() {
+        filterModal.classList.add('hidden');
+      });
+      
+      // 应用筛选
+      applyFilterBtn.addEventListener('click', function() {
+        // 获取筛选条件
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const severityHigh = document.getElementById('severityHigh').checked;
+        const severityMedium = document.getElementById('severityMedium').checked;
+        const severityLow = document.getElementById('severityLow').checked;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        
+        // 获取所有记录
+        let triageResults = JSON.parse(localStorage.getItem('triageResults') || '[]');
+        
+        // 应用筛选
+        const filteredResults = triageResults.filter(record => {
+          // 分类筛选
+          if (categoryFilter !== 'all' && record.category !== categoryFilter) {
+            return false;
+          }
+          
+          // 严重程度筛选
+          if (record.severity === '高风险' && !severityHigh) {
+            return false;
+          }
+          if (record.severity === '中风险' && !severityMedium) {
+            return false;
+          }
+          if (record.severity === '低风险' && !severityLow) {
+            return false;
+          }
+          
+          // 日期筛选
+          if (dateFrom && new Date(record.date) < new Date(dateFrom)) {
+            return false;
+          }
+          if (dateTo && new Date(record.date) > new Date(dateTo)) {
+            return false;
+          }
+          
+          return true;
+        });
+        
+        // 更新列表
+        const recordsList = document.getElementById('recordsList');
+        recordsList.innerHTML = '';
+        
+        if (filteredResults.length === 0) {
+          recordsList.innerHTML = `
+            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+              <i class="fa fa-search text-4xl mb-2"></i>
+              <p>没有找到匹配的记录</p>
+              <p class="text-sm mt-1">请尝试调整筛选条件</p>
+            </div>
+          `;
+        } else {
+          // 按时间戳降序排序
+          filteredResults.sort((a, b) => b.timestamp - a.timestamp);
+          
+          // 添加记录到列表
+          filteredResults.forEach(record => {
+            const recordItem = document.createElement('div');
+            recordItem.className = 'bg-white rounded-lg shadow-sm p-3 border-l-4 dark:bg-dark-light dark:text-white dark-transition cursor-pointer';
+            
+            // 根据严重程度设置边框颜色
+            if (record.severity === '高风险') {
+              recordItem.classList.add('border-red-500');
+            } else if (record.severity === '中风险') {
+              recordItem.classList.add('border-yellow-500');
+            } else {
+              recordItem.classList.add('border-green-500');
+            }
+            
+            // 记录内容
+            recordItem.innerHTML = `
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-medium text-gray-800 dark:text-white">${record.symptom}</h4>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${record.date}</p>
+                </div>
+                <span class="text-xs px-2 py-1 rounded-full ${getSeverityClass(record.severity)}">${record.severity}</span>
+              </div>
+              <div class="mt-2">
+                <p class="text-sm text-gray-600 dark:text-gray-300">${record.category}</p>
+              </div>
+            `;
+            
+            // 添加点击事件
+            recordItem.addEventListener('click', function() {
+              showRecordDetail(record);
+            });
+            
+            recordsList.appendChild(recordItem);
+          });
+        }
+        
+        // 关闭模态框
+        filterModal.classList.add('hidden');
+      });
+    }
+    
+    // 初始化记录详情功能
+    function initRecordDetailFeature() {
+      const closeDetailBtn = document.getElementById('closeDetailBtn');
+      const cancelDetailBtn = document.getElementById('cancelDetailBtn');
+      const recordDetailModalOverlay = document.getElementById('recordDetailModalOverlay');
+      
+      // 关闭记录详情模态框
+      closeDetailBtn.addEventListener('click', function() {
+        document.getElementById('recordDetailModal').classList.add('hidden');
+      });
+      
+      cancelDetailBtn.addEventListener('click', function() {
+        document.getElementById('recordDetailModal').classList.add('hidden');
+      });
+      
+      recordDetailModalOverlay.addEventListener('click', function() {
+        document.getElementById('recordDetailModal').classList.add('hidden');
+      });
+      
+      // 分享按钮事件
+      document.getElementById('shareDetailBtn').addEventListener('click', function() {
+        showToast('分享功能即将上线');
+      });
+    }
+    
+    // 显示记录详情
+    function showRecordDetail(record) {
+      const recordDetailContent = document.getElementById('recordDetailContent');
+      
+      // 填充详情内容
+      recordDetailContent.innerHTML = `
+        <div class="flex justify-between items-start">
+          <h4 class="text-lg font-medium text-gray-800 dark:text-white">${record.symptom}</h4>
+          <span class="text-xs px-2 py-1 rounded-full ${getSeverityClass(record.severity)}">${record.severity}</span>
+        </div>
+        
+        <div class="mt-3">
+          <p class="text-sm text-gray-600 dark:text-gray-300">${record.date}</p>
+        </div>
+        
+        <div class="mt-3">
+          <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">症状分类</h5>
+          <p class="text-sm text-gray-600 dark:text-gray-300">${record.category}</p>
+        </div>
+        
+        <div class="mt-3">
+          <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">详细描述</h5>
+          <p class="text-sm text-gray-600 dark:text-gray-300">${record.description || '无'}</p>
+        </div>
+        
+        <div class="mt-3">
+          <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">建议用药</h5>
+          <p class="text-sm text-gray-600 dark:text-gray-300">${record.medication || '无'}</p>
+        </div>
+      `;
+      
+      // 显示模态框
+      document.getElementById('recordDetailModal').classList.remove('hidden');
+    }
+    
+    // 显示提示信息
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg z-50 dark:bg-dark-light dark-transition';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 2000);
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      // 应用深色模式
+      const isDarkModeEnabled = localStorage.getItem('darkModeEnabled') === 'true';
+      if (isDarkModeEnabled) {
+        document.documentElement.classList.add('dark');
+      }
+      
+      // 初始化添加记录功能
+      initAddRecordFeature();
+      
+      initPage();
+    });
+    
+    // 初始化添加记录功能
+    function initAddRecordFeature() {
+      const addRecordBtn = document.getElementById('addRecordBtn');
+      const addRecordModal = document.getElementById('addRecordModal');
+      const closeAddRecordBtn = document.getElementById('closeAddRecordBtn');
+      const cancelAddRecordBtn = document.getElementById('cancelAddRecordBtn');
+      const addRecordModalOverlay = document.getElementById('addRecordModalOverlay');
+      const addRecordForm = document.getElementById('addRecordForm');
+      
+      // 打开模态框
+      addRecordBtn.addEventListener('click', function() {
+        addRecordModal.classList.remove('hidden');
+      });
+      
+      // 关闭模态框
+      closeAddRecordBtn.addEventListener('click', function() {
+        addRecordModal.classList.add('hidden');
+      });
+      
+      cancelAddRecordBtn.addEventListener('click', function() {
+        addRecordModal.classList.add('hidden');
+      });
+      
+      addRecordModalOverlay.addEventListener('click', function() {
+        addRecordModal.classList.add('hidden');
+      });
+      
+      // 表单提交
+      addRecordForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const symptom = document.getElementById('symptomInput').value;
+        const category = document.getElementById('categorySelect').value;
+        const description = document.getElementById('descriptionInput').value;
+        const medication = document.getElementById('medicationInput').value;
+        
+        // 创建新记录
+        const newRecord = {
+          id: Date.now().toString(), // 使用时间戳作为唯一ID
+          date: getCurrentDate(),
+          symptom: symptom,
+          category: category,
+          description: description,
+          medication: medication,
+          timestamp: Date.now()
+        };
+        
+        // 保存记录
+        saveNewRecord(newRecord);
+        
+        // 关闭模态框
+        addRecordModal.classList.add('hidden');
+        
+        // 重置表单
+        addRecordForm.reset();
+        
+        // 显示成功提示
+        showToast('记录添加成功');
+        
+        // 刷新记录列表
+        setTimeout(() => {
+          loadTriageRecords();
+        }, 1000);
+      });
+    }
+    
+    // 获取当前日期
+    function getCurrentDate() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+    
+    // 保存新记录
+    function saveNewRecord(record) {
+      // 获取现有记录
+      let healthRecords = JSON.parse(localStorage.getItem('healthRecords') || '[]');
+      
+      // 添加新记录
+      healthRecords.push(record);
+      
+      // 保存回localStorage
+      localStorage.setItem('healthRecords', JSON.stringify(healthRecords));
+      
+      // 更新分诊结果
+      updateTriageResult(record);
+    }
+    
+    // 更新分诊结果
+    function updateTriageResult(record) {
+      // 获取现有分诊结果
+      let triageResults = JSON.parse(localStorage.getItem('triageResults') || '[]');
+      
+      // 创建新的分诊结果
+      const newTriage = {
+        id: record.id,
+        date: record.date,
+        symptom: record.symptom,
+        category: record.category,
+        description: record.description,
+        medication: record.medication,
+        timestamp: record.timestamp,
+        severity: getSeverityLevel(record.symptom)
+      };
+      
+      // 添加新的分诊结果
+      triageResults.push(newTriage);
+      
+      // 保存回localStorage
+      localStorage.setItem('triageResults', JSON.stringify(triageResults));
+    }
+    
+    // 根据症状获取严重程度
+    function getSeverityLevel(symptom) {
+      // 简单的关键词匹配来确定严重程度
+      const highRiskKeywords = ['胸痛', '呼吸困难', '高烧', '头痛', '意识', '出血', '呕吐', '腹痛', '晕厥', '抽搐'];
+      const mediumRiskKeywords = ['咳嗽', '发热', '疲劳', '恶心', '腹泻', '头晕', '皮疹', '关节痛', '肌肉痛', '咽喉痛'];
+      
+      symptom = symptom.toLowerCase();
+      
+      for (const keyword of highRiskKeywords) {
+        if (symptom.includes(keyword.toLowerCase())) {
+          return '高风险';
+        }
+      }
+      
+      for (const keyword of mediumRiskKeywords) {
+        if (symptom.includes(keyword.toLowerCase())) {
+          return '中风险';
+        }
+      }
+      
+      return '低风险';
+    }
+  </script>
+</body>
+</html>

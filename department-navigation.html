@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医院科室导航 - 医疗健康助手</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        accent: '#2563eb',
+                        dark: {
+                            100: '#1e293b',
+                            200: '#0f172a',
+                            300: '#020617'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .department-icon {
+                transition: all 0.3s ease;
+            }
+            .department-card:hover .department-icon {
+                transform: scale(1.1);
+            }
+        }
+    </style>
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 深色模式滚动条 */
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* 页面过渡动画 */
+        .page-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 科室卡片动画 */
+        .department-card {
+            transition: all 0.3s ease;
+        }
+        
+        /* 流程步骤动画 */
+        .step-item {
+            transition: all 0.3s ease;
+        }
+        
+        .step-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* 科室详情弹窗 */
+        .department-detail {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            overflow-y: auto;
+        }
+        
+        .department-detail.active {
+            display: flex;
+        }
+        
+        /* 搜索结果动画 */
+        .search-result {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-200 dark:text-gray-200 page-transition">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white dark:bg-dark-100 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="backButton" class="mr-3 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-primary dark:text-secondary">医院科室导航</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300">
+                    <i class="fa fa-moon-o text-xl dark:hidden"></i>
+                    <i class="fa fa-sun-o text-xl hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 搜索框 -->
+        <div class="relative mb-8">
+            <input type="text" id="departmentSearch" placeholder="搜索科室或症状..." 
+                class="w-full py-3 px-5 pr-12 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-100 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-secondary">
+            <button id="searchButton" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                <i class="fa fa-search text-xl"></i>
+            </button>
+            <div id="searchResults" class="absolute left-0 right-0 mt-1 bg-white dark:bg-dark-100 rounded-lg shadow-lg z-30 hidden max-h-96 overflow-y-auto">
+                <!-- 搜索结果将通过JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 科室分类标签 -->
+        <div class="flex overflow-x-auto pb-4 mb-6 scrollbar-hide">
+            <button class="department-filter flex-shrink-0 px-4 py-2 mr-3 rounded-full bg-primary text-white" data-filter="all">
+                全部科室
+            </button>
+            <button class="department-filter flex-shrink-0 px-4 py-2 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="internal">
+                内科
+            </button>
+            <button class="department-filter flex-shrink-0 px-4 py-2 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="surgery">
+                外科
+            </button>
+            <button class="department-filter flex-shrink-0 px-4 py-2 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="women">
+                妇产科
+            </button>
+            <button class="department-filter flex-shrink-0 px-4 py-2 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="children">
+                儿科
+            </button>
+            <button class="department-filter flex-shrink-0 px-4 py-2 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="special">
+                专科
+            </button>
+            <button class="department-filter flex-shrink-0 px-4 py-2 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="医技">
+                医技科室
+            </button>
+        </div>
+        
+        <!-- 科室列表 -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-10">
+            <!-- 内科系统 -->
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="internal" data-id="respiratory">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-lungs text-2xl text-primary dark:text-secondary department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">呼吸内科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="internal" data-id="cardiology">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-heartbeat text-2xl text-red-500 dark:text-red-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">心血管内科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="internal" data-id="gastroenterology">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-utensils text-2xl text-green-500 dark:text-green-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">消化内科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="internal" data-id="neurology">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-brain text-2xl text-purple-500 dark:text-purple-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">神经内科</h3>
+                </div>
+            </div>
+            
+            <!-- 外科系统 -->
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="surgery" data-id="generalsurgery">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-scalpel text-2xl text-yellow-500 dark:text-yellow-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">普通外科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="surgery" data-id="orthopedics">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-bone text-2xl text-indigo-500 dark:text-indigo-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">骨科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="surgery" data-id="neurosurgery">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-pink-100 dark:bg-pink-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-user-md text-2xl text-pink-500 dark:text-pink-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">神经外科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="surgery" data-id="urology">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-tint text-2xl text-teal-500 dark:text-teal-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">泌尿外科</h3>
+                </div>
+            </div>
+            
+            <!-- 妇产科 -->
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="women" data-id="gynecology">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-female text-2xl text-rose-500 dark:text-rose-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">妇科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="women" data-id="obstetrics">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-lime-100 dark:bg-lime-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-baby text-2xl text-lime-500 dark:text-lime-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">产科</h3>
+                </div>
+            </div>
+            
+            <!-- 儿科 -->
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="children" data-id="pediatrics">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-child text-2xl text-cyan-500 dark:text-cyan-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">儿科</h3>
+                </div>
+            </div>
+            
+            <!-- 专科 -->
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="special" data-id="ophthalmology">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-eye text-2xl text-amber-500 dark:text-amber-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">眼科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="special" data-id="ent">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-deaf text-2xl text-violet-500 dark:text-violet-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">耳鼻喉科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="special" data-id="dermatology">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-fuchsia-100 dark:bg-fuchsia-900 flex items-center justify-center mb-3">
+                        <i class="fa fa-allergies text-2xl text-fuchsia-500 dark:text-fuchsia-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">皮肤科</h3>
+                </div>
+            </div>
+            
+            <!-- 医技科室 -->
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="医技" data-id="laboratory">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-3">
+                        <i class="fa fa-flask text-2xl text-gray-500 dark:text-gray-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">检验科</h3>
+                </div>
+            </div>
+            
+            <div class="department-card card-hover bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden" data-category="医技" data-id="imaging">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-3">
+                        <i class="fa fa-x-ray text-2xl text-gray-500 dark:text-gray-400 department-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-center">医学影像科</h3>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 就诊流程 -->
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6 mb-10">
+            <h2 class="text-xl font-bold mb-6">就诊流程指南</h2>
+            
+            <div class="relative">
+                <!-- 流程线 -->
+                <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gray-200 dark:bg-gray-700 transform -translate-x-1/2"></div>
+                
+                <!-- 流程步骤 -->
+                <div class="space-y-8">
+                    <!-- 步骤1 -->
+                    <div class="step-item flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
+                            <h3 class="text-lg font-semibold text-primary dark:text-secondary">1. 就诊前准备</h3>
+                            <ul class="mt-2 space-y-1 text-gray-600 dark:text-gray-400">
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>提前预约挂号</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>整理既往病史资料</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>明确就诊目的</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>携带有效证件</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="w-10 h-10 rounded-full bg-primary dark:bg-secondary flex items-center justify-center text-white font-bold z-10">1</div>
+                        
+                        <div class="md:w-1/2 md:pl-8 hidden md:block"></div>
+                    </div>
+                    
+                    <!-- 步骤2 -->
+                    <div class="step-item flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8 hidden md:block"></div>
+                        
+                        <div class="w-10 h-10 rounded-full bg-primary dark:bg-secondary flex items-center justify-center text-white font-bold z-10">2</div>
+                        
+                        <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0">
+                            <h3 class="text-lg font-semibold text-primary dark:text-secondary">2. 挂号候诊</h3>
+                            <ul class="mt-2 space-y-1 text-gray-600 dark:text-gray-400">
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>凭身份证/医保卡挂号</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>到相应科室候诊区等待</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>关注电子叫号系统</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>保持候诊区安静</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤3 -->
+                    <div class="step-item flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
+                            <h3 class="text-lg font-semibold text-primary dark:text-secondary">3. 医生问诊</h3>
+                            <ul class="mt-2 space-y-1 text-gray-600 dark:text-gray-400">
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>如实描述病情症状</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>提供既往病史和用药情况</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>认真倾听医生建议</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>有疑问及时提出</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="w-10 h-10 rounded-full bg-primary dark:bg-secondary flex items-center justify-center text-white font-bold z-10">3</div>
+                        
+                        <div class="md:w-1/2 md:pl-8 hidden md:block"></div>
+                    </div>
+                    
+                    <!-- 步骤4 -->
+                    <div class="step-item flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8 hidden md:block"></div>
+                        
+                        <div class="w-10 h-10 rounded-full bg-primary dark:bg-secondary flex items-center justify-center text-white font-bold z-10">4</div>
+                        
+                        <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0">
+                            <h3 class="text-lg font-semibold text-primary dark:text-secondary">4. 检查与治疗</h3>
+                            <ul class="mt-2 space-y-1 text-gray-600 dark:text-gray-400">
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>凭检查单到相应科室检查</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>按医嘱进行各项检查</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>检查后等待结果</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>按医嘱接受治疗</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤5 -->
+                    <div class="step-item flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8 md:text-right mb-4 md:mb-0">
+                            <h3 class="text-lg font-semibold text-primary dark:text-secondary">5. 缴费取药</h3>
+                            <ul class="mt-2 space-y-1 text-gray-600 dark:text-gray-400">
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>凭处方到收费处缴费</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>到药房凭缴费单取药</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>核对药品信息</li>
+                                <li><i class="fa fa-check-circle text-green-500 mr-2"></i>咨询药师用药方法</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="w-10 h-10 rounded-full bg-primary dark:bg-secondary flex items-center justify-center text-white font-bold z-10">5</div>
+                        
+                        <div class="md:w-1/2 md:pl-8 hidden md:block"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 常见症状与科室匹配 -->
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6">常见症状与科室匹配</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-stethoscope text-primary dark:text-secondary mr-2"></i>
+                        发热、咳嗽、呼吸困难
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">呼吸内科</span></p>
+                </div>
+                
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-heartbeat text-primary dark:text-secondary mr-2"></i>
+                        胸痛、心悸、高血压
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">心血管内科</span></p>
+                </div>
+                
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-utensils text-primary dark:text-secondary mr-2"></i>
+                        腹痛、腹泻、消化不良
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">消化内科</span></p>
+                </div>
+                
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-brain text-primary dark:text-secondary mr-2"></i>
+                        头痛、头晕、肢体麻木
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">神经内科</span></p>
+                </div>
+                
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-bone text-primary dark:text-secondary mr-2"></i>
+                        关节疼痛、骨折、运动障碍
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">骨科</span></p>
+                </div>
+                
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-female text-primary dark:text-secondary mr-2"></i>
+                        月经不调、妇科炎症
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">妇科</span></p>
+                </div>
+                
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-child text-primary dark:text-secondary mr-2"></i>
+                        儿童发热、咳嗽、腹泻
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">儿科</span></p>
+                </div>
+                
+                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2 flex items-center">
+                        <i class="fa fa-eye text-primary dark:text-secondary mr-2"></i>
+                        视力下降、眼睛疼痛
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400">建议就诊：<span class="text-primary dark:text-secondary font-medium">眼科</span></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-100 shadow-lg z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-around py-3">
+                <a href="index.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-home text-xl"></i>
+                    <span class="text-xs mt-1">首页</span>
+                </a>
+                <a href="record.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-file-text text-xl"></i>
+                    <span class="text-xs mt-1">记录</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-user text-xl"></i>
+                    <span class="text-xs mt-1">我的</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 科室详情弹窗 -->
+    <div id="departmentDetail" class="department-detail items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-100 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="detailTitle" class="text-2xl font-bold text-primary dark:text-secondary"></h2>
+                    <button id="closeDetail" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div id="detailContent">
+                    <!-- 科室详情内容将通过JavaScript动态生成 -->
+                </div>
+                
+                <div class="mt-8 flex justify-end">
+                    <button id="detailBack" class="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors duration-300">
+                        返回
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 全局变量
+        const departmentData = {
+            // 内科系统
+            respiratory: {
+                name: "呼吸内科",
+                icon: "lungs",
+                color: "blue",
+                description: "呼吸内科是诊治呼吸系统疾病的专业科室，主要负责治疗各种原因引起的呼吸系统疾病。",
+                diseases: [
+                    "感冒、咳嗽、咳痰",
+                    "肺炎、支气管炎",
+                    "哮喘、慢性阻塞性肺疾病",
+                    "肺结核、肺部肿瘤",
+                    "睡眠呼吸暂停综合征"
+                ],
+                examinations: [
+                    "肺功能检查",
+                    "胸部X光检查",
+                    "胸部CT检查",
+                    "支气管镜检查",
+                    "血气分析"
+                ],
+                tips: "就诊前避免剧烈运动，以免影响肺功能检查结果。如有咳痰，可留取痰液标本供检查。"
+            },
+            cardiology: {
+                name: "心血管内科",
+                icon: "heartbeat",
+                color: "red",
+                description: "心血管内科是诊治心脏及血管系统疾病的专业科室，主要负责治疗各种心脏和血管相关疾病。",
+                diseases: [
+                    "高血压、冠心病",
+                    "心绞痛、心肌梗死",
+                    "心律失常、心力衰竭",
+                    "心肌病、心脏瓣膜病",
+                    "先天性心脏病"
+                ],
+                examinations: [
+                    "心电图检查",
+                    "心脏超声检查",
+                    "动态心电图监测",
+                    "运动负荷试验",
+                    "冠状动脉造影"
+                ],
+                tips: "就诊前需空腹，以便进行血液检查。如有服用降压药、降糖药等药物，请提前告知医生。"
+            },
+            gastroenterology: {
+                name: "消化内科",
+                icon: "utensils",
+                color: "green",
+                description: "消化内科是诊治消化系统疾病的专业科室，主要负责治疗食管、胃、肠、肝、胆、胰等器官的疾病。",
+                diseases: [
+                    "胃炎、胃溃疡",
+                    "肠炎、肠易激综合征",
+                    "肝炎、肝硬化",
+                    "胆囊炎、胆结石",
+                    "胰腺炎、胰腺肿瘤"
+                ],
+                examinations: [
+                    "胃镜、肠镜检查",
+                    "腹部超声检查",
+                    "肝功能检查",
+                    "粪便常规检查",
+                    "消化道造影检查"
+                ],
+                tips: "胃镜、肠镜检查前需禁食禁水，并按医嘱服用泻药清洁肠道。肝功能检查需空腹进行。"
+            },
+            neurology: {
+                name: "神经内科",
+                icon: "brain",
+                color: "purple",
+                description: "神经内科是诊治神经系统疾病的专业科室，主要负责治疗中枢神经系统和周围神经系统疾病。",
+                diseases: [
+                    "头痛、头晕",
+                    "脑梗死、脑出血",
+                    "癫痫、帕金森病",
+                    "多发性硬化症",
+                    "周围神经病变"
+                ],
+                examinations: [
+                    "头颅CT、MRI检查",
+                    "脑电图检查",
+                    "神经电生理检查",
+                    "腰椎穿刺检查",
+                    "脑血管造影检查"
+                ],
+                tips: "如有服用抗癫痫药物、抗凝药物等，请提前告知医生。脑电图检查前需洗头，避免使用发胶等护发产品。"
+            },
+            
+            // 外科系统
+            generalsurgery: {
+                name: "普通外科",
+                icon: "scalpel",
+                color: "yellow",
+                description: "普通外科是诊治需要手术治疗的腹部、体表软组织等疾病的专业科室，是外科系统的基础科室。",
+                diseases: [
+                    "阑尾炎、胆囊炎",
+                    "肠梗阻、消化道穿孔",
+                    "甲状腺疾病、乳腺疾病",
+                    "疝气、静脉曲张",
+                    "腹部肿瘤"
+                ],
+                examinations: [
+                    "腹部超声检查",
+                    "CT、MRI检查",
+                    "肿瘤标志物检查",
+                    "病理检查",
+                    "消化道造影检查"
+                ],
+                tips: "手术前需禁食禁水，具体时间遵医嘱。如有服用抗凝药物、降糖药物等，请提前告知医生。"
+            },
+            orthopedics: {
+                name: "骨科",
+                icon: "bone",
+                color: "indigo",
+                description: "骨科是诊治骨骼、关节、肌肉等运动系统疾病的专业科室，主要负责治疗各种骨折、关节疾病等。",
+                diseases: [
+                    "骨折、脱位",
+                    "关节炎、骨质疏松",
+                    "腰椎间盘突出症",
+                    "颈椎病、肩周炎",
+                    "骨肿瘤、骨髓炎"
+                ],
+                examinations: [
+                    "X光检查",
+                    "CT、MRI检查",
+                    "骨密度检查",
+                    "关节镜检查",
+                    "肌电图检查"
+                ],
+                tips: "就诊时可携带既往的影像学资料供医生参考。如有佩戴支具、矫形器等，请一并带来。"
+            },
+            neurosurgery: {
+                name: "神经外科",
+                icon: "user-md",
+                color: "pink",
+                description: "神经外科是诊治需要手术治疗的神经系统疾病的专业科室，主要负责治疗脑部、脊髓等部位的疾病。",
+                diseases: [
+                    "脑肿瘤、脑血管畸形",
+                    "脑外伤、脑出血",
+                    "脊髓肿瘤、脊髓损伤",
+                    "脑积水、颅底畸形",
+                    "三叉神经痛、面肌痉挛"
+                ],
+                examinations: [
+                    "头颅CT、MRI检查",
+                    "脑血管造影检查",
+                    "脊髓造影检查",
+                    "神经电生理检查",
+                    "颅内压监测"
+                ],
+                tips: "手术前需剃头，具体范围遵医嘱。如有服用抗凝药物、抗癫痫药物等，请提前告知医生。"
+            },
+            urology: {
+                name: "泌尿外科",
+                icon: "tint",
+                color: "teal",
+                description: "泌尿外科是诊治泌尿系统和男性生殖系统疾病的专业科室，主要负责治疗肾脏、膀胱、前列腺等部位的疾病。",
+                diseases: [
+                    "肾结石、输尿管结石",
+                    "膀胱炎、前列腺炎",
+                    "前列腺增生、前列腺癌",
+                    "肾癌、膀胱癌",
+                    " urinary incontinence"
+                ],
+                examinations: [
+                    "尿常规检查",
+                    "泌尿系超声检查",
+                    "CT、MRI检查",
+                    "膀胱镜检查",
+                    "前列腺特异性抗原检查"
+                ],
+                tips: "泌尿系超声检查前需憋尿。前列腺检查前需排空膀胱。如有服用抗凝药物等，请提前告知医生。"
+            },
+            
+            // 妇产科
+            gynecology: {
+                name: "妇科",
+                icon: "female",
+                color: "rose",
+                description: "妇科是诊治女性生殖系统疾病的专业科室，主要负责治疗女性生殖器官的疾病。",
+                diseases: [
+                    "月经不调、痛经",
+                    "阴道炎、宫颈炎",
+                    "子宫肌瘤、卵巢囊肿",
+                    "子宫内膜异位症",
+                    "妇科恶性肿瘤"
+                ],
+                examinations: [
+                    "妇科检查",
+                    "妇科超声检查",
+                    "宫颈细胞学检查",
+                    "HPV检测",
+                    "性激素六项检查"
+                ],
+                tips: "妇科检查应避开月经期。检查前一天避免性生活、阴道冲洗和阴道用药。"
+            },
+            obstetrics: {
+                name: "产科",
+                icon: "baby",
+                color: "lime",
+                description: "产科是负责女性妊娠、分娩和产后护理的专业科室，主要提供孕期保健、分娩服务和产后康复指导。",
+                services: [
+                    "孕期保健、产前检查",
+                    "孕期并发症诊治",
+                    "正常分娩、剖宫产",
+                    "产后康复指导",
+                    "新生儿护理指导"
+                ],
+                examinations: [
+                    "产科超声检查",
+                    "唐筛、无创DNA检测",
+                    "糖耐量试验",
+                    "胎心监护",
+                    "血常规、尿常规检查"
+                ],
+                tips: "孕期定期产检，请遵医嘱按时就诊。分娩前可准备好待产包，包括产妇和新生儿所需物品。"
+            },
+            
+            // 儿科
+            pediatrics: {
+                name: "儿科",
+                icon: "child",
+                color: "cyan",
+                description: "儿科是诊治儿童疾病的专业科室，主要负责治疗从新生儿到14岁儿童的各种疾病。",
+                diseases: [
+                    "儿童发热、咳嗽",
+                    "腹泻、呕吐、腹痛",
+                    "儿童肺炎、支气管炎",
+                    "儿童哮喘、过敏性疾病",
+                    "儿童常见传染病"
+                ],
+                examinations: [
+                    "血常规、尿常规检查",
+                    "儿童胸片检查",
+                    "儿童心电图检查",
+                    "儿童超声检查",
+                    "儿童发育评估"
+                ],
+                tips: "就诊时请携带儿童的预防接种证。如有服用药物，请告知医生药物名称和剂量。"
+            },
+            
+            // 专科
+            ophthalmology: {
+                name: "眼科",
+                icon: "eye",
+                color: "amber",
+                description: "眼科是诊治眼部疾病的专业科室，主要负责治疗各种眼科疾病，包括屈光不正、白内障、青光眼等。",
+                diseases: [
+                    "近视、远视、散光",
+                    "结膜炎、角膜炎",
+                    "白内障、青光眼",
+                    "视网膜病变",
+                    "眼外伤"
+                ],
+                examinations: [
+                    "视力检查",
+                    "眼压测量",
+                    "裂隙灯检查",
+                    "眼底检查",
+                    "光学相干断层扫描"
+                ],
+                tips: "眼科检查前请勿佩戴隐形眼镜。如有服用抗凝药物等，请提前告知医生。"
+            },
+            ent: {
+                name: "耳鼻喉科",
+                icon: "deaf",
+                color: "violet",
+                description: "耳鼻喉科是诊治耳、鼻、喉及头颈部疾病的专业科室，主要负责治疗这些部位的各种疾病。",
+                diseases: [
+                    "中耳炎、耳鸣、耳聋",
+                    "鼻炎、鼻窦炎",
+                    "咽炎、扁桃体炎",
+                    "喉炎、声音嘶哑",
+                    "头颈部肿瘤"
+                ],
+                examinations: [
+                    "耳镜检查",
+                    "鼻内镜检查",
+                    "喉镜检查",
+                    "听力检查",
+                    "过敏原检测"
+                ],
+                tips: "喉镜检查前需禁食禁水，具体时间遵医嘱。听力检查前请清洁耳朵，避免佩戴耳机听音乐。"
+            },
+            dermatology: {
+                name: "皮肤科",
+                icon: "allergies",
+                color: "fuchsia",
+                description: "皮肤科是诊治皮肤、毛发、指甲等疾病的专业科室，主要负责治疗各种皮肤病和性传播疾病。",
+                diseases: [
+                    "湿疹、皮炎",
+                    "荨麻疹、过敏性疾病",
+                    "痤疮、玫瑰痤疮",
+                    "银屑病、白癜风",
+                    "性传播疾病"
+                ],
+                examinations: [
+                    "皮肤镜检查",
+                    "真菌检查",
+                    "过敏原检测",
+                    "病理检查",
+                    "伍德灯检查"
+                ],
+                tips: "就诊前请勿涂抹化妆品、药膏等，以免影响医生观察。如有服用药物，请告知医生药物名称和剂量。"
+            },
+            
+            // 医技科室
+            laboratory: {
+                name: "检验科",
+                icon: "flask",
+                color: "gray",
+                description: "检验科是进行各种医学检验的专业科室，主要负责为临床提供实验室诊断依据。",
+                services: [
+                    "血液检查",
+                    "尿液检查",
+                    "粪便检查",
+                    "生化检查",
+                    "免疫检查",
+                    "微生物检查"
+                ],
+                preparation: [
+                    "血液检查一般需空腹8-12小时",
+                    "尿液检查需留取中段尿",
+                    "粪便检查需留取新鲜标本",
+                    "女性月经期不宜进行尿液和粪便检查",
+                    "检查前避免剧烈运动和情绪激动"
+                ],
+                tips: "请按医嘱准备检查前的饮食和作息。检查时请携带检查单和就诊卡。"
+            },
+            imaging: {
+                name: "医学影像科",
+                icon: "x-ray",
+                color: "gray",
+                description: "医学影像科是进行各种医学影像学检查的专业科室，主要负责为临床提供影像学诊断依据。",
+                services: [
+                    "X光检查",
+                    "CT检查",
+                    "MRI检查",
+                    "超声检查",
+                    "核医学检查",
+                    "介入放射学检查"
+                ],
+                preparation: [
+                    "X光检查前需去除金属物品",
+                    "CT检查前需禁食禁水，具体时间遵医嘱",
+                    "MRI检查前需去除金属物品，体内有金属植入物者需提前告知",
+                    "超声检查中，腹部检查需空腹，妇科和泌尿系检查需憋尿",
+                    "核医学检查前需注射放射性药物，检查后需遵医嘱进行辐射防护"
+                ],
+                tips: "请按医嘱准备检查前的饮食和作息。检查时请携带检查单和就诊卡。"
+            }
+        };
+        
+        // 症状与科室匹配数据
+        const symptomToDepartment = {
+            "发热": ["respiratory", "pediatrics"],
+            "咳嗽": ["respiratory", "pediatrics"],
+            "呼吸困难": ["respiratory"],
+            "胸痛": ["cardiology"],
+            "心悸": ["cardiology"],
+            "腹痛": ["gastroenterology", "generalsurgery"],
+            "腹泻": ["gastroenterology", "pediatrics"],
+            "头痛": ["neurology"],
+            "头晕": ["neurology"],
+            "关节疼痛": ["orthopedics"],
+            "骨折": ["orthopedics"],
+            "月经不调": ["gynecology"],
+            "视力下降": ["ophthalmology"],
+            "眼睛疼痛": ["ophthalmology"],
+            "耳鸣": ["ent"],
+            "鼻塞": ["ent"],
+            "喉咙痛": ["ent"],
+            "皮疹": ["dermatology"],
+            "皮肤瘙痒": ["dermatology"]
+        };
+        
+        // 深色模式切换
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        
+        // 检查本地存储中的主题偏好
+        if (localStorage.getItem('darkMode') === 'enabled' || 
+            (localStorage.getItem('darkMode') !== 'disabled' && 
+             window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+        });
+        
+        // 绑定事件
+        function bindEvents() {
+            // 返回按钮点击事件
+            document.getElementById('backButton').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 主题切换按钮点击事件
+            themeToggle.addEventListener('click', function() {
+                if (htmlElement.classList.contains('dark')) {
+                    htmlElement.classList.remove('dark');
+                    localStorage.setItem('darkMode', 'disabled');
+                } else {
+                    htmlElement.classList.add('dark');
+                    localStorage.setItem('darkMode', 'enabled');
+                }
+            });
+            
+            // 科室卡片点击事件
+            document.querySelectorAll('.department-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const departmentId = this.getAttribute('data-id');
+                    showDepartmentDetail(departmentId);
+                });
+            });
+            
+            // 关闭科室详情弹窗按钮点击事件
+            document.getElementById('closeDetail').addEventListener('click', function() {
+                document.getElementById('departmentDetail').classList.remove('active');
+            });
+            
+            // 返回按钮点击事件
+            document.getElementById('detailBack').addEventListener('click', function() {
+                document.getElementById('departmentDetail').classList.remove('active');
+            });
+            
+            // 科室分类标签点击事件
+            document.querySelectorAll('.department-filter').forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有标签的活跃状态
+                    document.querySelectorAll('.department-filter').forEach(btn => {
+                        btn.classList.remove('bg-primary', 'text-white');
+                        btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+                    });
+                    
+                    // 添加当前标签的活跃状态
+                    this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+                    this.classList.add('bg-primary', 'text-white');
+                    
+                    // 过滤科室
+                    const filter = this.getAttribute('data-filter');
+                    filterDepartments(filter);
+                });
+            });
+            
+            // 搜索框输入事件
+            document.getElementById('departmentSearch').addEventListener('input', function() {
+                const searchTerm = this.value.trim().toLowerCase();
+                searchDepartments(searchTerm);
+            });
+            
+            // 搜索按钮点击事件
+            document.getElementById('searchButton').addEventListener('click', function() {
+                const searchTerm = document.getElementById('departmentSearch').value.trim().toLowerCase();
+                searchDepartments(searchTerm);
+            });
+            
+            // 点击搜索结果项事件
+            document.getElementById('searchResults').addEventListener('click', function(e) {
+                const resultItem = e.target.closest('.search-result');
+                if (resultItem) {
+                    const departmentId = resultItem.getAttribute('data-id');
+                    showDepartmentDetail(departmentId);
+                    document.getElementById('searchResults').classList.add('hidden');
+                }
+            });
+            
+            // 点击页面其他区域关闭搜索结果
+            document.addEventListener('click', function(e) {
+                const searchContainer = document.querySelector('.relative.mb-8');
+                if (!searchContainer.contains(e.target)) {
+                    document.getElementById('searchResults').classList.add('hidden');
+                }
+            });
+        }
+        
+        // 显示科室详情
+        function showDepartmentDetail(departmentId) {
+            const department = departmentData[departmentId];
+            if (!department) return;
+            
+            // 设置标题
+            document.getElementById('detailTitle').textContent = department.name;
+            
+            // 设置内容
+            let content = '';
+            
+            // 添加描述
+            content += `
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">科室介绍</h3>
+                    <p class="text-gray-600 dark:text-gray-400">${department.description}</p>
+                </div>
+            `;
+            
+            // 添加疾病或服务
+            if (department.diseases) {
+                content += `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2">常见疾病</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                `;
+                
+                department.diseases.forEach(disease => {
+                    content += `<li>${disease}</li>`;
+                });
+                
+                content += `
+                        </ul>
+                    </div>
+                `;
+            } else if (department.services) {
+                content += `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2">服务项目</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                `;
+                
+                department.services.forEach(service => {
+                    content += `<li>${service}</li>`;
+                });
+                
+                content += `
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // 添加检查项目
+            if (department.examinations) {
+                content += `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2">常见检查</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                `;
+                
+                department.examinations.forEach(exam => {
+                    content += `<li>${exam}</li>`;
+                });
+                
+                content += `
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // 添加准备事项
+            if (department.preparation) {
+                content += `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2">检查准备</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                `;
+                
+                department.preparation.forEach(prep => {
+                    content += `<li>${prep}</li>`;
+                });
+                
+                content += `
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // 添加就诊提示
+            if (department.tips) {
+                content += `
+                    <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <i class="fa fa-info-circle text-primary dark:text-secondary mr-2"></i>
+                            就诊提示
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-400">${department.tips}</p>
+                    </div>
+                `;
+            }
+            
+            // 设置内容
+            document.getElementById('detailContent').innerHTML = content;
+            
+            // 显示弹窗
+            document.getElementById('departmentDetail').classList.add('active');
+        }
+        
+        // 过滤科室
+        function filterDepartments(filter) {
+            document.querySelectorAll('.department-card').forEach(card => {
+                if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // 搜索科室
+        function searchDepartments(searchTerm) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+            
+            let results = [];
+            
+            // 搜索科室名称
+            for (const [id, department] of Object.entries(departmentData)) {
+                if (department.name.toLowerCase().includes(searchTerm)) {
+                    results.push({
+                        id: id,
+                        name: department.name,
+                        type: 'department'
+                    });
+                }
+            }
+            
+            // 搜索症状
+            for (const [symptom, departmentIds] of Object.entries(symptomToDepartment)) {
+                if (symptom.toLowerCase().includes(searchTerm)) {
+                    departmentIds.forEach(id => {
+                        results.push({
+                            id: id,
+                            name: `${symptom} → ${departmentData[id].name}`,
+                            type: 'symptom'
+                        });
+                    });
+                }
+            }
+            
+            // 显示搜索结果
+            if (results.length > 0) {
+                let html = '';
+                
+                results.forEach(result => {
+                    html += `
+                        <div class="search-result p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer" data-id="${result.id}">
+                            <p class="font-medium">${result.name}</p>
+                        </div>
+                    `;
+                });
+                
+                searchResults.innerHTML = html;
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.innerHTML = `
+                    <div class="p-3 text-gray-500 dark:text-gray-400">
+                        <p>未找到相关科室或症状</p>
+                    </div>
+                `;
+                searchResults.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

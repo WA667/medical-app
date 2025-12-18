@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我们 - 医疗健康助手</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        accent: '#2563eb',
+                        dark: {
+                            100: '#1e293b',
+                            200: '#0f172a',
+                            300: '#020617'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 深色模式滚动条 */
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* 页面过渡动画 */
+        .page-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 卡片动画 */
+        .team-card {
+            transition: all 0.3s ease;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .team-card img {
+            transition: all 0.5s ease;
+        }
+        
+        .team-card:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-200 dark:text-gray-200 page-transition">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white dark:bg-dark-100 shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="backButton" class="mr-3 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-primary dark:text-secondary">关于我们</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300">
+                    <i class="fa fa-moon-o dark:hidden text-xl"></i>
+                    <i class="fa fa-sun-o hidden dark:block text-xl"></i>
+                </button>
+                <button id="readAloudToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300">
+                    <i class="fa fa-volume-up text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 应用介绍 -->
+        <section class="mb-10">
+            <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6">
+                <div class="flex flex-col items-center mb-6">
+                    <div class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                        <i class="fa fa-heartbeat text-4xl text-primary dark:text-secondary"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-2">医疗健康助手</h2>
+                    <p class="text-gray-500 dark:text-gray-400">您的个人健康管理专家</p>
+                </div>
+                <div class="space-y-4 text-gray-600 dark:text-gray-300">
+                    <p>医疗健康助手是一款专为用户打造的健康管理应用，旨在帮助您更好地了解和管理自己的健康状况。我们提供了多种功能，包括症状查询、健康记录、医院引导等，让您的健康管理更加便捷。</p>
+                    <p>我们的使命是通过技术创新，为用户提供高质量、个性化的健康服务，帮助每个人实现更健康的生活方式。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 应用特点 -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fa fa-star text-primary dark:text-secondary mr-2"></i>
+                应用特点
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md p-5 card-hover">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-search text-primary dark:text-secondary"></i>
+                        </div>
+                        <h3 class="font-semibold">症状查询与分诊</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">通过智能算法分析您的症状，提供初步分诊建议和就医指导。</p>
+                </div>
+                <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md p-5 card-hover">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-file-text-o text-green-600 dark:text-green-400"></i>
+                        </div>
+                        <h3 class="font-semibold">健康记录管理</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">记录并追踪您的健康数据，包括症状、用药和就医记录等。</p>
+                </div>
+                <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md p-5 card-hover">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-hospital-o text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <h3 class="font-semibold">医院引导</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">提供医院科室介绍和就医指南，帮助您快速找到合适的医疗资源。</p>
+                </div>
+                <div class="bg-white dark:bg-dark-100 rounded-xl shadow-md p-5 card-hover">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mr-3">
+                            <i class="fa fa-bell-o text-orange-600 dark:text-orange-400"></i>
+                        </div>
+                        <h3 class="font-semibold">健康提醒</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">设置用药、体检等健康提醒，帮助您养成良好的健康习惯。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 团队介绍 -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fa fa-users text-primary dark:text-secondary mr-2"></i>
+                我们的团队
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 团队成员1 -->
+                <div class="team-card bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="张医生" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg mb-1">张医生</h3>
+                        <p class="text-primary dark:text-secondary mb-3">首席医疗顾问</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">资深内科医生，拥有20年临床经验，专注于慢性病管理和预防医学。</p>
+                    </div>
+                </div>
+                
+                <!-- 团队成员2 -->
+                <div class="team-card bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="李工程师" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg mb-1">李工程师</h3>
+                        <p class="text-primary dark:text-secondary mb-3">技术总监</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">软件工程师，专注于医疗健康领域的技术创新和产品开发。</p>
+                    </div>
+                </div>
+                
+                <!-- 团队成员3 -->
+                <div class="team-card bg-white dark:bg-dark-100 rounded-xl shadow-md overflow-hidden">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="王设计师" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg mb-1">王设计师</h3>
+                        <p class="text-primary dark:text-secondary mb-3">UI/UX设计师</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">专注于用户体验设计，致力于打造简洁易用的医疗健康应用界面。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系方式 -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fa fa-envelope-o text-primary dark:text-secondary mr-2"></i>
+                联系我们
+            </h2>
+            <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6">
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-4">
+                            <i class="fa fa-envelope text-primary dark:text-secondary"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">电子邮件</p>
+                            <p class="font-medium">contact@healthapp.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-4">
+                            <i class="fa fa-phone text-green-600 dark:text-green-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">客服电话</p>
+                            <p class="font-medium">400-123-4567</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-4">
+                            <i class="fa fa-map-marker text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">办公地址</p>
+                            <p class="font-medium">北京市海淀区中关村科技园区</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mr-4">
+                            <i class="fa fa-clock-o text-orange-600 dark:text-orange-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">工作时间</p>
+                            <p class="font-medium">周一至周五 9:00-18:00</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 反馈表单 -->
+                <div class="mt-8">
+                    <h3 class="font-bold mb-4">给我们留言</h3>
+                    <form id="feedbackForm" class="space-y-4">
+                        <div>
+                            <label for="feedbackName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">姓名</label>
+                            <input type="text" id="feedbackName" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent dark:bg-dark-200">
+                        </div>
+                        <div>
+                            <label for="feedbackEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">邮箱</label>
+                            <input type="email" id="feedbackEmail" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent dark:bg-dark-200">
+                        </div>
+                        <div>
+                            <label for="feedbackMessage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">留言内容</label>
+                            <textarea id="feedbackMessage" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-secondary focus:border-transparent dark:bg-dark-200"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300">提交留言</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 版本信息 -->
+        <section class="mb-10">
+            <div class="bg-white dark:bg-dark-100 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold mb-4">版本信息</h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-gray-600 dark:text-gray-400">应用版本</span>
+                        <span class="font-medium">1.0.0</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-gray-600 dark:text-gray-400">最后更新</span>
+                        <span class="font-medium">2025年7月21日</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">系统要求</span>
+                        <span class="font-medium">iOS 12.0+ / Android 8.0+</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-100 shadow-lg z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-around py-3">
+                <a href="index.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-home text-xl"></i>
+                    <span class="text-xs mt-1">首页</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-user text-xl"></i>
+                    <span class="text-xs mt-1">我的</span>
+                </a>
+                <a href="record.html" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary">
+                    <i class="fa fa-file-text text-xl"></i>
+                    <span class="text-xs mt-1">记录</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 深色模式切换
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        
+        // 检查本地存储中的主题偏好
+        if (localStorage.getItem('darkMode') === 'enabled' || 
+            (localStorage.getItem('darkMode') !== 'disabled' && 
+             window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        }
+        
+        // 主题切换事件
+        themeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('darkMode', 'disabled');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('darkMode', 'enabled');
+            }
+        });
+        
+        // 全局朗诵功能
+        const readAloudToggle = document.getElementById('readAloudToggle');
+        let isReading = false;
+        let speechSynthesisUtterance = null;
+        
+        // 检查本地存储中的朗诵偏好
+        if (localStorage.getItem('readAloudEnabled') === 'true') {
+            // 默认不自动开始朗诵
+        }
+        
+        // 朗诵切换事件
+        readAloudToggle.addEventListener('click', () => {
+            if (isReading) {
+                stopReading();
+            } else {
+                startReading();
+            }
+        });
+        
+        // 开始朗诵
+        function startReading() {
+            if ('speechSynthesis' in window) {
+                // 获取页面主要内容
+                const mainContent = document.querySelector('main').textContent;
+                
+                // 创建语音合成对象
+                speechSynthesisUtterance = new SpeechSynthesisUtterance(mainContent);
+                speechSynthesisUtterance.lang = 'zh-CN';
+                speechSynthesisUtterance.rate = 0.9; // 语速稍慢，适合阅读
+                
+                // 开始朗诵
+                window.speechSynthesis.speak(speechSynthesisUtterance);
+                
+                // 更新状态
+                isReading = true;
+                readAloudToggle.innerHTML = '<i class="fa fa-stop text-xl"></i>';
+                readAloudToggle.classList.add('text-red-500');
+                
+                // 朗诵结束事件
+                speechSynthesisUtterance.onend = () => {
+                    stopReading();
+                };
+            } else {
+                alert('您的浏览器不支持语音合成功能');
+            }
+        }
+        
+        // 停止朗诵
+        function stopReading() {
+            if (speechSynthesisUtterance) {
+                window.speechSynthesis.cancel();
+                speechSynthesisUtterance = null;
+            }
+            
+            // 更新状态
+            isReading = false;
+            readAloudToggle.innerHTML = '<i class="fa fa-volume-up text-xl"></i>';
+            readAloudToggle.classList.remove('text-red-500');
+        }
+        
+        // 返回按钮
+        const backButton = document.getElementById('backButton');
+        backButton.addEventListener('click', () => {
+            window.history.back();
+        });
+        
+        // 反馈表单提交
+        const feedbackForm = document.getElementById('feedbackForm');
+        feedbackForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const name = document.getElementById('feedbackName').value;
+            const email = document.getElementById('feedbackEmail').value;
+            const message = document.getElementById('feedbackMessage').value;
+            
+            // 简单验证
+            if (!name || !email || !message) {
+                alert('请填写完整的反馈信息');
+                return;
+            }
+            
+            // 模拟提交成功
+            alert('感谢您的反馈！我们会尽快回复您。');
+            
+            // 重置表单
+            feedbackForm.reset();
+        });
+        
+        // 页面加载动画
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.style.opacity = '1';
+            document.body.style.transform = 'translateY(0)';
+        });
+    </script>
+</body>
+</html>
